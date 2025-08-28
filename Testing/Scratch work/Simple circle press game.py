@@ -1,7 +1,10 @@
 import arcade
+import random
 
-SCREEN_WIDTH = 640
-SCREEN_HEIGHT = 480
+from arcade.camera import generate_view_matrix
+
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 800
 
 
 class Ball:
@@ -22,53 +25,75 @@ class Ball:
                                   self.color)
 
 
+class GeneratedBalls:
+    def __init__(self, position_x, position_y, radius, color):
+        self.position_x = position_x
+        self.position_y = position_y
+        self.radius = radius
+        self.color = color
+
+    def draw(self):
+        arcade.draw_circle_filled(self.position_x, self.position_y, self.radius, self.color)
+
+
+
+
+
 class MyGame(arcade.Window):
 
     def __init__(self, width, height, title):
 
         # Call the parent class's init function
         super().__init__(width, height, title)
+
+        # Make the mouse disappear when it is over the window.
+        # So we just see our object, not the pointer.
         self.set_mouse_visible(False)
+
         arcade.set_background_color(arcade.color.ASH_GREY)
 
         # Create our ball
-        self.ball = Ball(50, 50, 15, arcade.color.AUBURN)
+        self.ball = Ball(50, 50, 10, arcade.color.AUBURN)
+
+        generated_x = random.randint(50, 750)
+        generated_y = random.randint(50, 750)
+
+        gene_ball = []
+
+        for i in range(5):
+            self.generated_ball = GeneratedBalls(generated_x, generated_y, 25, arcade.color.BLUE)
+
+            gene_ball.append(self.generated_ball)
+
+
+    score = 0
+
 
     def on_draw(self):
         """ Called whenever we need to draw the window. """
         self.clear()
         self.ball.draw()
+        self.generated_ball.draw()
 
     def on_mouse_motion(self, x, y, dx, dy):
+        """ Called to update our objects.
+        Happens approximately 60 times per second."""
         self.ball.position_x = x
         self.ball.position_y = y
 
-    def on_mouse_press(self, x, y, button, modifiers):
-        """ Called when the user presses a mouse button. """
 
-        if button == arcade.MOUSE_BUTTON_LEFT:
-            print("Left mouse button pressed at", x, y)
-            self.ball.color = arcade.color.BLUE
-            self.ball.radius = 10
 
-            laser_sound = arcade.load_sound("laser.wav")
-            arcade.play_sound(laser_sound)
-        elif button == arcade.MOUSE_BUTTON_RIGHT:
-            print("Right mouse button pressed at", x, y)
-            self.ball.color = arcade.color.GOLD
-            self.ball.radius = 100
 
-    def on_key_press(self, key, modifiers):
-        if key == arcade.key.LEFT:
-            print("Left key hit")
-        elif key == arcade.key.A:
-            print("The 'a' key was hit")
-            self.ball.position_x += 10
+
+
+
+
+
 
 
 
 def main():
-    window = MyGame(640, 480, "Drawing Example")
+    window = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, "Drawing Example")
     arcade.run()
 
 

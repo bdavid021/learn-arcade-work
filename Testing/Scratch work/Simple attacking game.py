@@ -79,8 +79,8 @@ def main():
                 print(f"Gulp, Gulp, Gulp... nu stii de ce, dar te simti mai sanatos. Ti-ai crescut viata cu 20, acum ai {om.hp}")
             elif actiune == 3 and inventar.piatra_de_slefuire > 0:
                 inventar.piatra_de_slefuire -= 1
-                om.base_attack = 15
-                print("I-ai spus Orcului sa stea putin pana iti slefuiesti sabia. Acum ataci mai tare pentru 1 tura. Haide, Orcul nu mai are rabdare")
+                om.base_attack = om.base_attack + 5
+                print("I-ai spus Orcului sa stea putin pana iti slefuiesti sabia. Acum ataci mai tare pentru 1 tura. Haide, Orcul nu mai are rabdare ")
             else:
                 print("Incerci sa fentezi sistemul? ei bine smecherasule... vei devenii o testoasa slaba")
                 om.hp = 10
