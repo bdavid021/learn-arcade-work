@@ -1,6 +1,6 @@
 import arcade
 import random
-
+import time
 import math
 
 
@@ -60,7 +60,7 @@ class MyGame(arcade.Window):
         #zombie characteristics
 
 
-        self.zombie_base_attack = random.randint(5, 15)
+        self.zombie_base_attack = 0
 
         #Bulltet sprite
 
@@ -69,6 +69,12 @@ class MyGame(arcade.Window):
 
         self.zombie_bullet_list = None
         self.zombie_bullet_sprite = None
+        self.bullet = None
+
+        #MEDKIT SPRITE
+
+        self.medkit_list = None
+        self.medkit_sprite = None
 
         #Aiming Arror
 
@@ -115,23 +121,88 @@ class MyGame(arcade.Window):
 
         self.zombie_bullet_list = arcade.SpriteList()
 
+        # MEDKIT
+
+        self.medkit_list = arcade.SpriteList()
+
+        self.medkit_sprite = arcade.Sprite("health-red 32px.png", SPRITE_SCALING)
+
+        self.medkit_sprite.center_x = random.randint(150, 990)
+        self.medkit_sprite.center_y = random.randint(250, 580)
+
+        self.medkit_list.append(self.medkit_sprite)
+
+        self.spawn_medkit = False
+
+
 
     def on_draw(self):
 
         self.clear()
 
-        # Scena
-        arcade.draw_lrbt_rectangle_filled(0, 1000, 150, 161, arcade.color.ARCADE_GREEN)
-        arcade.draw_lrbt_rectangle_filled(0, 1000, 1, 150, arcade.color.BROWN_NOSE)
+        #Peisaj in caz de lovitura mare
 
-        #Copacei
+        #Scena
+        if self.zombie_base_attack >= 15:
+            arcade.set_background_color(arcade.color.SLATE_GRAY)
 
+            x = 300
+            y = 500
+
+            arcade.draw_circle_filled(x - 70, y, 35, arcade.color.YANKEES_BLUE)
+            arcade.draw_circle_filled(x, y, 60, arcade.color.YANKEES_BLUE)
+            arcade.draw_circle_filled(x + 70, y, 35, arcade.color.YANKEES_BLUE)
+
+            x2 = 700
+            y2 = 420
+            arcade.draw_circle_filled(x2 - 70, y2, 35, arcade.color.YANKEES_BLUE)
+            arcade.draw_circle_filled(x2, y2, 60, arcade.color.YANKEES_BLUE)
+            arcade.draw_circle_filled(x2 + 70, y2, 35, arcade.color.YANKEES_BLUE)
+
+
+
+        else:
+            arcade.set_background_color(arcade.color.LIGHT_BLUE)
+
+            # Norisori
+
+            x = 300
+            y = 500
+
+            arcade.draw_circle_filled(x - 70, y, 35, arcade.color.WHITE)
+            arcade.draw_circle_filled(x, y, 60, arcade.color.WHITE)
+            arcade.draw_circle_filled(x + 70, y, 35, arcade.color.WHITE)
+
+            x2 = 700
+            y2 = 420
+            arcade.draw_circle_filled(x2 - 70, y2, 35, arcade.color.WHITE)
+            arcade.draw_circle_filled(x2, y2, 60, arcade.color.WHITE)
+            arcade.draw_circle_filled(x2 + 70, y2, 35, arcade.color.WHITE)
+
+
+
+        # Copacei
 
         arcade.draw_lrbt_rectangle_filled(70, 100, 161, 290, arcade.csscolor.BROWN)
+        arcade.draw_lrbt_rectangle_outline(70, 100, 161, 290, arcade.csscolor.BLACK)
         arcade.draw_circle_filled(85, 290, 80, arcade.csscolor.DARK_GREEN)
+        arcade.draw_circle_outline(85, 290, 80, arcade.csscolor.BLACK,1)
 
         arcade.draw_lrbt_rectangle_filled(390, 420, 161, 290, arcade.csscolor.BROWN)
+        arcade.draw_lrbt_rectangle_outline(390, 420, 161, 290, arcade.csscolor.BLACK)
         arcade.draw_triangle_filled(400, 390, 310, 220, 500, 220, arcade.csscolor.DARK_GREEN)
+        arcade.draw_triangle_outline(400, 390, 310, 220, 500, 220, arcade.csscolor.BLACK)
+
+
+
+
+        # Scena
+        arcade.draw_lrbt_rectangle_filled(0, 1000, 150, 161, arcade.color.ARCADE_GREEN)
+        arcade.draw_lrbt_rectangle_outline(0, 1001, 150, 161, arcade.color.BLACK, 1)
+
+        arcade.draw_lrbt_rectangle_filled(0, 1000, 0, 150, arcade.color.BROWN_NOSE)
+
+
 
 #==============================================
 
@@ -143,13 +214,16 @@ class MyGame(arcade.Window):
             #time.sleep(0.9)
 
             arcade.draw_lrbt_rectangle_filled(self.left+self.right, self.right+self.right, self.top, self.bottom, arcade.color.LIGHT_BLUE)
+            arcade.draw_lrbt_rectangle_outline(self.left+self.right, self.right+self.right, self.top, self.bottom, arcade.color.BLACK, 3)
             arcade.draw_text("Da cu zarul", 320, 70, arcade.color.BLACK, 27)
         if self.turn == "player":
             arcade.draw_lrbt_rectangle_filled(self.left, self.right, self.top, self.bottom, arcade.color.PEAR)
-            arcade.draw_text(f"Ataca!", 110, 70, arcade.color.BLACK, 30)
+            arcade.draw_lrbt_rectangle_outline(self.left, self.right, self.top, self.bottom, arcade.color.BLACK, 3)
+            arcade.draw_text(f"Ataca!", 100, 70, arcade.color.BLACK, 30)
 
         else:
             ...
+
 
 
         arcade.draw_lrbt_rectangle_filled(self.left+self.right+self.right, self.right*3, self.top, self.bottom, arcade.color.LIGHT_BLUE)
@@ -160,24 +234,26 @@ class MyGame(arcade.Window):
         # Afisez viata zombie
 
         arcade.draw_text(f"{self.zombie_health} HP", 790, 350, arcade.color.ARCADE_GREEN, 25)
-        arcade.draw_text(f"{self.zombie_base_attack} Damage", 790, 390, arcade.color.ARCADE_GREEN, 25)
+        arcade.draw_text(f"{self.zombie_base_attack} DMG", 790, 390, arcade.color.ARCADE_GREEN, 25)
 
         #Afisez viata om
 
         arcade.draw_text(f"{self.health} HP", 130, 350, arcade.color.DARK_RED, 25)
         arcade.draw_text(self.text, 300, 400, arcade.color.BLACK, 30)
-
-
-        #Afisez statisitici importante, colt stanga sus =============
         if self.double_damage_chance == True:
 
-            arcade.draw_text(f"Ataci cu {self.player_base_attack*2} damage", 20, 570, arcade.color.BLACK, 20)
+            arcade.draw_text(f"{self.player_base_attack*2} DMG", 130, 390, arcade.color.DARK_RED, 25)
         else:
-            arcade.draw_text(f"Ataci cu {self.player_base_attack} damage", 20, 570, arcade.color.BLACK, 20)
+            arcade.draw_text(f"{self.player_base_attack } DMG", 130, 390, arcade.color.DARK_RED, 25)
+
+        #Afisez statisitici importante, colt stanga sus =============
 
 
-        arcade.draw_text(f"Sansa ta de a te ferii este {self.dodge_chance} ", 20, 540, arcade.color.BLACK, 20)
-        arcade.draw_text(f"Tura aceasta dai damaga dublu: {self.double_damage_chance} ", 20, 510, arcade.color.BLACK, 20)
+
+
+
+        arcade.draw_text(f"Sansa ta de a te ferii este {self.dodge_chance} ", 20, 570, arcade.color.BLACK, 20)
+        arcade.draw_text(f"Tura aceasta dai damaga dublu: {self.double_damage_chance} ", 20, 540, arcade.color.BLACK, 20)
 
         #desenez player
 
@@ -194,6 +270,10 @@ class MyGame(arcade.Window):
         #desenez zombie bullet
 
         self.zombie_bullet_list.draw()
+
+        #Desenez medkit
+
+        self.medkit_list.draw()
 
         # End game
         if self.zombie_health <= 0:
@@ -246,13 +326,19 @@ class MyGame(arcade.Window):
 
         self.mouse_x = x
         self.mouse_y = y
+        if y <161:
+            self.set_mouse_visible(True)
+        else:
+            self.set_mouse_visible(False)
+
+        # Daca nu vrem ca sa se vada cursorul mousului
 
 
     def on_mouse_press(self, x, y, button, modifiers):
 
         if self.turn == "dice":
 
-            if 300 < x < self.right * 2 and y > self.top and y < self.bottom:
+            if 300 < x < self.right * 2 and y > self.top and y < self.bottom or arcade.key.SPACE == True:
 
 
                 arcade.play_sound(DICE)
@@ -269,11 +355,33 @@ class MyGame(arcade.Window):
                 self.dice_done = True
                 self.player_done = False
 
+                medkit_spawn_change = random.randint(1, 10)
+
+                if medkit_spawn_change == 1:
+                    self.spawn_medkit = True
+                    medkit = arcade.Sprite("health-red 32px.png", SPRITE_SCALING)
+
+                    medkit.center_x = random.randint(150, 990)
+                    medkit.center_y = random.randint(250, 580)
+
+                    self.medkit_list.append(medkit)
+
+
+                self.zombie_base_attack = random.randint(10, 20)
+
+
+
+
+
+
+
+                print(medkit_spawn_change)
 
 
                 print(self.turn)
 
         #Buronul din stanga de atac ------
+
         if self.turn == "player":
             if self.left < x < self.right and y > self.top and y < self.bottom:
                 print("Buton apăsat!", self.turn)
@@ -315,13 +423,13 @@ class MyGame(arcade.Window):
         self.bullet_list.update()
         self.zombie_list.update()
 
-        for bullet in self.bullet_list:
-            hit_list = arcade.check_for_collision_with_list(bullet, self.zombie_list)
+        for self.bullet in self.bullet_list:
+            hit_list = arcade.check_for_collision_with_list(self.bullet, self.zombie_list)
 
-            hit_list_zombie_bullet =  arcade.check_for_collision_with_list(bullet, self.zombie_bullet_list)
+            hit_list_zombie_bullet =  arcade.check_for_collision_with_list(self.bullet, self.zombie_bullet_list)
 
             if len(hit_list) > 0:
-                bullet.remove_from_sprite_lists()
+                self.bullet.remove_from_sprite_lists()
                 if self.double_damage_chance == True:
                     self.zombie_health -= self.player_double_damage_attack
                     arcade.play_sound(ZOMBIE_HURT)
@@ -329,8 +437,6 @@ class MyGame(arcade.Window):
                     self.zombie_health -= self.player_base_attack
                     arcade.play_sound(ZOMBIE_HURT)
 
-            if len(hit_list_zombie_bullet) > 0:
-                bullet.remove_from_sprite_lists()
 
 
 
@@ -342,20 +448,38 @@ class MyGame(arcade.Window):
                 print("evade")
             else:
                 hit_list = arcade.check_for_collision_with_list(zombie_bullet, self.player_list)
-                self.zombie_base_attack = random.randint(10, 20)
+
+
                 if len(hit_list) > 0:
+
                     zombie_bullet.remove_from_sprite_lists()
+
+
                     if self.double_damage_chance == True:
+
                         self.health -= self.zombie_base_attack
                     else:
+
                         self.health-= self.zombie_base_attack
 
             player_hit_list = arcade.check_for_collision_with_list(zombie_bullet, self.bullet_list)
 
             if len(player_hit_list) > 0:
                 zombie_bullet.remove_from_sprite_lists()
+                self.bullet.remove_from_sprite_lists()
+
 
         self.zombie_bullet_list.update()
+
+        for medkitlist in self.medkit_list:
+
+            hit_list = arcade.check_for_collision_with_list(medkitlist, self.bullet_list)
+
+            if len(hit_list) > 0:
+                self.health = self.health + 20
+                self.bullet.remove_from_sprite_lists()
+                medkitlist.remove_from_sprite_lists()
+
 
 
 
@@ -379,7 +503,7 @@ class MyGame(arcade.Window):
 
             zombie_bullet.center_x = self.zombie_sprite.center_x - 50
             zombie_bullet.center_y = 190
-            zombie_bullet.change_x = -BULLET_SPEED+1.5
+            zombie_bullet.change_x = -random.randint(2,8)
             self.zombie_bullet_list.append(zombie_bullet)
             self.dodge_chance = random.randint(1, 10)
 
