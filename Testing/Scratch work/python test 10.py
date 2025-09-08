@@ -7,7 +7,7 @@ import math
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
 SPRITE_SCALING = 1.5
-BULLET_SCALING = 0.20
+BULLET_SCALING = 0.15
 BULLET_SPEED =6
 
 #sounds
@@ -16,14 +16,92 @@ THROW = arcade.load_sound("sounds/fireball-whoosh-1-179125.mp3")
 FAIL = arcade.load_sound("sounds/cartoon-fail-trumpet-278822.mp3")
 WIN = arcade.load_sound("sounds/you-win-sequence-3-183950.mp3")
 ZOMBIE_HURT = arcade.load_sound("sounds/retro-hurt-2-236675.mp3")
+ELEVATOR_MUSIC = arcade.load_sound("sounds/jazz-lounge-elevator-music-332339.mp3")
+
+
+#DRAWING THINGS
+
+def draw_tutorial_objects():
+    # TUTORIAL MENIU =========================
+
+    # BUTON BACK
+    arcade.draw_lrbt_rectangle_filled(930, 990, 530, 590, arcade.color.LIGHT_RED_OCHRE)
+    arcade.draw_lrbt_rectangle_outline(930, 990, 530, 590, arcade.color.BLACK, 3)
+    arcade.draw_text("BACK", 935, 554, arcade.color.BLACK, 17)
+
+    # EXPLICATII
+    arcade.draw_text("Bine ai venit la Dice & Bullet!", 220, 550, arcade.color.BLACK, 25)
+
+    arcade.draw_text("GENERAL GAME KNOWLEDGE: ", 20, 460, arcade.color.BLACK, 20)
+
+    arcade.draw_text("1. Scopul acestui joc este sa invingi zombi-ul (HP = 0), fara ca tu sa mori.", 20, 420,
+                     arcade.color.BLACK, 17)
+    arcade.draw_text(
+        "2. Trebuie sa dai cu zarul apasand pe buton, daca ai nimerit un numar par, atunci in aceea tura vei da 2x DMG.",
+        20, 390, arcade.color.BLACK, 17)
+    arcade.draw_text("3. Si zombie-ul da cu zarul, asa ca fii atent cat de puternic te ataca!", 20, 360,
+                     arcade.color.BLACK, 17)
+    arcade.draw_text(
+        "4. Misca, mouse-ul pentru a tinti, unde vrei sa tragi pe tasta \"F\" blochezi tinta, iar pe \"R\" deblochezi.",
+        20, 330, arcade.color.BLACK, 17)
+    arcade.draw_text("5. Dupa ce ai blocat tinta ATACA zombi-ul, sau bullet-ul acestuia pentru a bloca atacului lui!",
+                     20, 300, arcade.color.BLACK, 17)
+    arcade.draw_text("6. Ai o sansa de 10% de a evita complet atacul zombi-ului!", 20, 270, arcade.color.BLACK, 17)
+
+    arcade.draw_text("ITEMS: ", 20, 230, arcade.color.BLACK, 20)
+
+    arcade.draw_text("- Medkit: Ai o sansa de 10% ca sa se spawneze un Medkit pe harta. Acesta regenereaza 20 HP.", 20,
+                     190, arcade.color.BLACK, 17)
+
+    arcade.draw_text("TIPS: ", 20, 150, arcade.color.BLACK, 17)
+
+    arcade.draw_text("1. Gandeste-te ce se merita mai mult! Sa ataci zombi-ul, bazandu-te ca poate eviti atacul?", 20,
+                     120, arcade.color.BLACK, 17)
+    arcade.draw_text(
+        "   sau poate esti low, si se merita sa ataci bullet-ul zombi-ului pentru a fi sigur? sau de ce nu sa iei", 20,
+        90, arcade.color.BLACK, 17)
+    arcade.draw_text("   acel medkit... dar oare se merita? zarul iti va purta noroc?", 20, 60, arcade.color.BLACK, 17)
+    arcade.draw_text("TU DECIZI ASTA! Mult noroc!", 300, 20, arcade.color.BLACK, 24)
+
+def draw_main_menu():
+    # BUTON START
+    arcade.set_background_color(arcade.color.YELLOW_GREEN)
+    arcade.draw_lrbt_rectangle_filled(300, 700, 300, 380, arcade.color.LIGHT_BLUE)
+    arcade.draw_lrbt_rectangle_outline(300, 700, 300, 380, arcade.color.BLACK, 3)
+    arcade.draw_text("START", 420, 320, arcade.color.BLACK, 50)
+
+    # TITLU
+    arcade.draw_text("Dice & Bullets!", 224, 446, arcade.color.BLACK, 71)
+    arcade.draw_text("Dice & Bullets!", 230, 450, arcade.color.ARCADE_GREEN, 70)
+
+    # BUTON TUTORIAL
+    arcade.set_background_color(arcade.color.YELLOW_GREEN)
+    arcade.draw_lrbt_rectangle_filled(300, 700, 200, 280, arcade.color.LIGHT_RED_OCHRE)
+    arcade.draw_lrbt_rectangle_outline(300, 700, 200, 280, arcade.color.BLACK, 3)
+    arcade.draw_text("TUTORIAL", 373, 220, arcade.color.BLACK, 50)
+
+
+
+
 
 class MyGame(arcade.Window):
 
     def __init__(self):
 
         # Call the parent class's init function
-        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, "RPG")
+        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, "Dice & Bullets!")
         arcade.set_background_color(arcade.color.LIGHT_BLUE)
+
+
+
+        #STARTING MENU
+
+        self.menu_choice = 1
+
+
+        self.game_done = False
+
+
 
         #Some coordonates for buttons
         self.left = 50
@@ -89,6 +167,102 @@ class MyGame(arcade.Window):
         self.key = arcade.key.F
         self.key2 = arcade.key.R
 
+        # Moving DICE
+
+        self.dice_list = arcade.SpriteList()
+        self.dice_sprite = arcade.Sprite("dice_question.png", SPRITE_SCALING+2)
+
+        self.dice_sprite.position_y = 100
+        self.dice_sprite.position_x = 100
+
+
+        self.dice_list.append(self.dice_sprite)
+
+
+    def draw_HUD(self):
+        # =================AFISAZE (HUD)
+
+        # Afisez viata zombie
+
+        arcade.draw_text(f"{self.zombie_health} HP", 790, 350, arcade.color.ARCADE_GREEN, 25)
+        arcade.draw_text(f"{self.zombie_base_attack} DMG", 790, 390, arcade.color.ARCADE_GREEN, 25)
+
+        # Afisez viata om
+
+        arcade.draw_text(f"{self.health} HP", 130, 350, arcade.color.DARK_RED, 25)
+        arcade.draw_text(self.text, 300, 400, arcade.color.BLACK, 30)
+        if self.double_damage_chance == True:
+
+            arcade.draw_text(f"{self.player_base_attack * 2} DMG", 130, 390, arcade.color.DARK_RED, 25)
+        else:
+            arcade.draw_text(f"{self.player_base_attack} DMG", 130, 390, arcade.color.DARK_RED, 25)
+
+        # Afisez statisitici importante, colt stanga sus =============
+
+        arcade.draw_text(f"Sansa ta de a te ferii este {self.dodge_chance} ", 20, 570, arcade.color.BLACK, 20)
+        arcade.draw_text(f"Tura aceasta dai damaga dublu: {self.double_damage_chance} ", 20, 540, arcade.color.BLACK,
+                         20)
+
+
+    def draw_MAIN_GAME(self):
+
+        # Peisaj in caz de lovitura mare
+
+        # Scena
+        if self.zombie_base_attack >= 15:
+            arcade.set_background_color(arcade.color.SLATE_GRAY)
+
+            x = 300
+            y = 500
+
+            arcade.draw_circle_filled(x - 70, y, 35, arcade.color.YANKEES_BLUE)
+            arcade.draw_circle_filled(x, y, 60, arcade.color.YANKEES_BLUE)
+            arcade.draw_circle_filled(x + 70, y, 35, arcade.color.YANKEES_BLUE)
+
+            x2 = 700
+            y2 = 420
+            arcade.draw_circle_filled(x2 - 70, y2, 35, arcade.color.YANKEES_BLUE)
+            arcade.draw_circle_filled(x2, y2, 60, arcade.color.YANKEES_BLUE)
+            arcade.draw_circle_filled(x2 + 70, y2, 35, arcade.color.YANKEES_BLUE)
+
+
+
+        else:
+            arcade.set_background_color(arcade.color.LIGHT_BLUE)
+
+            # Norisori
+
+            x = 300
+            y = 500
+
+            arcade.draw_circle_filled(x - 70, y, 35, arcade.color.WHITE)
+            arcade.draw_circle_filled(x, y, 60, arcade.color.WHITE)
+            arcade.draw_circle_filled(x + 70, y, 35, arcade.color.WHITE)
+
+            x2 = 700
+            y2 = 420
+            arcade.draw_circle_filled(x2 - 70, y2, 35, arcade.color.WHITE)
+            arcade.draw_circle_filled(x2, y2, 60, arcade.color.WHITE)
+            arcade.draw_circle_filled(x2 + 70, y2, 35, arcade.color.WHITE)
+
+        # Copacei
+
+        arcade.draw_lrbt_rectangle_filled(70, 100, 161, 290, arcade.csscolor.BROWN)
+        arcade.draw_lrbt_rectangle_outline(70, 100, 161, 290, arcade.csscolor.BLACK)
+        arcade.draw_circle_filled(85, 290, 80, arcade.csscolor.DARK_GREEN)
+        arcade.draw_circle_outline(85, 290, 80, arcade.csscolor.BLACK, 1)
+
+        arcade.draw_lrbt_rectangle_filled(390, 420, 161, 290, arcade.csscolor.BROWN)
+        arcade.draw_lrbt_rectangle_outline(390, 420, 161, 290, arcade.csscolor.BLACK)
+        arcade.draw_triangle_filled(400, 390, 310, 220, 500, 220, arcade.csscolor.DARK_GREEN)
+        arcade.draw_triangle_outline(400, 390, 310, 220, 500, 220, arcade.csscolor.BLACK)
+
+        # Scena
+        arcade.draw_lrbt_rectangle_filled(0, 1000, 150, 161, arcade.color.ARCADE_GREEN)
+        arcade.draw_lrbt_rectangle_outline(0, 1001, 150, 161, arcade.color.BLACK, 1)
+
+        arcade.draw_lrbt_rectangle_filled(0, 1000, 0, 150, arcade.color.BROWN_NOSE)
+
 
 
     def setup(self):
@@ -134,178 +308,138 @@ class MyGame(arcade.Window):
 
         self.spawn_medkit = False
 
+        if self.menu_choice == 1 :
+            player = arcade.play_sound(ELEVATOR_MUSIC)
+
 
 
     def on_draw(self):
 
         self.clear()
 
-        #Peisaj in caz de lovitura mare
 
-        #Scena
-        if self.zombie_base_attack >= 15:
-            arcade.set_background_color(arcade.color.SLATE_GRAY)
-
-            x = 300
-            y = 500
-
-            arcade.draw_circle_filled(x - 70, y, 35, arcade.color.YANKEES_BLUE)
-            arcade.draw_circle_filled(x, y, 60, arcade.color.YANKEES_BLUE)
-            arcade.draw_circle_filled(x + 70, y, 35, arcade.color.YANKEES_BLUE)
-
-            x2 = 700
-            y2 = 420
-            arcade.draw_circle_filled(x2 - 70, y2, 35, arcade.color.YANKEES_BLUE)
-            arcade.draw_circle_filled(x2, y2, 60, arcade.color.YANKEES_BLUE)
-            arcade.draw_circle_filled(x2 + 70, y2, 35, arcade.color.YANKEES_BLUE)
+        #MENIU ********************************************************************************************************
 
 
+        if self.menu_choice == 1:
 
-        else:
-            arcade.set_background_color(arcade.color.LIGHT_BLUE)
+            #MAIN MENU
 
-            # Norisori
-
-            x = 300
-            y = 500
-
-            arcade.draw_circle_filled(x - 70, y, 35, arcade.color.WHITE)
-            arcade.draw_circle_filled(x, y, 60, arcade.color.WHITE)
-            arcade.draw_circle_filled(x + 70, y, 35, arcade.color.WHITE)
-
-            x2 = 700
-            y2 = 420
-            arcade.draw_circle_filled(x2 - 70, y2, 35, arcade.color.WHITE)
-            arcade.draw_circle_filled(x2, y2, 60, arcade.color.WHITE)
-            arcade.draw_circle_filled(x2 + 70, y2, 35, arcade.color.WHITE)
+            draw_main_menu()
 
 
+            self.dice_list.draw()
 
-        # Copacei
 
-        arcade.draw_lrbt_rectangle_filled(70, 100, 161, 290, arcade.csscolor.BROWN)
-        arcade.draw_lrbt_rectangle_outline(70, 100, 161, 290, arcade.csscolor.BLACK)
-        arcade.draw_circle_filled(85, 290, 80, arcade.csscolor.DARK_GREEN)
-        arcade.draw_circle_outline(85, 290, 80, arcade.csscolor.BLACK,1)
+        elif self.menu_choice == 2:
 
-        arcade.draw_lrbt_rectangle_filled(390, 420, 161, 290, arcade.csscolor.BROWN)
-        arcade.draw_lrbt_rectangle_outline(390, 420, 161, 290, arcade.csscolor.BLACK)
-        arcade.draw_triangle_filled(400, 390, 310, 220, 500, 220, arcade.csscolor.DARK_GREEN)
-        arcade.draw_triangle_outline(400, 390, 310, 220, 500, 220, arcade.csscolor.BLACK)
+            #GAME
+
+            self.draw_MAIN_GAME()
+
+
+            self.draw_HUD()
+
+    #==============================================
 
 
 
 
-        # Scena
-        arcade.draw_lrbt_rectangle_filled(0, 1000, 150, 161, arcade.color.ARCADE_GREEN)
-        arcade.draw_lrbt_rectangle_outline(0, 1001, 150, 161, arcade.color.BLACK, 1)
+            #butoanele-------------
+            if self.turn == "dice":
+                #time.sleep(0.9)
 
-        arcade.draw_lrbt_rectangle_filled(0, 1000, 0, 150, arcade.color.BROWN_NOSE)
+                arcade.draw_lrbt_rectangle_filled(self.left+self.right, self.right+self.right, self.top, self.bottom, arcade.color.LIGHT_BLUE)
+                arcade.draw_lrbt_rectangle_outline(self.left+self.right, self.right+self.right, self.top, self.bottom, arcade.color.BLACK, 3)
+                arcade.draw_text("Da cu zarul", 320, 70, arcade.color.BLACK, 27)
+            if self.turn == "player":
+                arcade.draw_lrbt_rectangle_filled(self.left, self.right, self.top, self.bottom, arcade.color.PEAR)
+                arcade.draw_lrbt_rectangle_outline(self.left, self.right, self.top, self.bottom, arcade.color.BLACK, 3)
+                arcade.draw_text(f"Ataca!", 100, 70, arcade.color.BLACK, 30)
 
-
-
-#==============================================
-
-
-
-
-        #butoanele-------------
-        if self.turn == "dice":
-            #time.sleep(0.9)
-
-            arcade.draw_lrbt_rectangle_filled(self.left+self.right, self.right+self.right, self.top, self.bottom, arcade.color.LIGHT_BLUE)
-            arcade.draw_lrbt_rectangle_outline(self.left+self.right, self.right+self.right, self.top, self.bottom, arcade.color.BLACK, 3)
-            arcade.draw_text("Da cu zarul", 320, 70, arcade.color.BLACK, 27)
-        if self.turn == "player":
-            arcade.draw_lrbt_rectangle_filled(self.left, self.right, self.top, self.bottom, arcade.color.PEAR)
-            arcade.draw_lrbt_rectangle_outline(self.left, self.right, self.top, self.bottom, arcade.color.BLACK, 3)
-            arcade.draw_text(f"Ataca!", 100, 70, arcade.color.BLACK, 30)
-
-        else:
-            ...
+            else:
+                ...
 
 
 
-        arcade.draw_lrbt_rectangle_filled(self.left+self.right+self.right, self.right*3, self.top, self.bottom, arcade.color.LIGHT_BLUE)
-        arcade.draw_text("Zombi, atac", 565, 70, arcade.color.BLACK, 27)
-
-#=================AFISAZE (HUD)
-
-        # Afisez viata zombie
-
-        arcade.draw_text(f"{self.zombie_health} HP", 790, 350, arcade.color.ARCADE_GREEN, 25)
-        arcade.draw_text(f"{self.zombie_base_attack} DMG", 790, 390, arcade.color.ARCADE_GREEN, 25)
-
-        #Afisez viata om
-
-        arcade.draw_text(f"{self.health} HP", 130, 350, arcade.color.DARK_RED, 25)
-        arcade.draw_text(self.text, 300, 400, arcade.color.BLACK, 30)
-        if self.double_damage_chance == True:
-
-            arcade.draw_text(f"{self.player_base_attack*2} DMG", 130, 390, arcade.color.DARK_RED, 25)
-        else:
-            arcade.draw_text(f"{self.player_base_attack } DMG", 130, 390, arcade.color.DARK_RED, 25)
-
-        #Afisez statisitici importante, colt stanga sus =============
+            arcade.draw_lrbt_rectangle_filled(self.left+self.right+self.right, self.right*3, self.top, self.bottom, arcade.color.LIGHT_BLUE)
+            arcade.draw_text("Zombi, atac", 565, 70, arcade.color.BLACK, 27)
 
 
 
+            #desenez player
+
+            self.player_list.draw()
+
+            #desenez zombie
+
+            self.zombie_list.draw()
+
+            #desenez bullet
+
+            self.bullet_list.draw()
+
+            #desenez zombie bullet
+
+            self.zombie_bullet_list.draw()
+
+            #Desenez medkit
+
+            self.medkit_list.draw()
 
 
-        arcade.draw_text(f"Sansa ta de a te ferii este {self.dodge_chance} ", 20, 570, arcade.color.BLACK, 20)
-        arcade.draw_text(f"Tura aceasta dai damaga dublu: {self.double_damage_chance} ", 20, 540, arcade.color.BLACK, 20)
 
-        #desenez player
+            # End game
+            if self.zombie_health <= 0:
 
-        self.player_list.draw()
+                arcade.play_sound(WIN)
 
-        #desenez zombie
+                arcade.draw_text("Ai castigat", 230, 300, arcade.color.BLUEBERRY, 110)
 
-        self.zombie_list.draw()
+                self.menu_choice = 1
+                self.game_done = True
+            if self.health <= 0:
 
-        #desenez bullet
+                arcade.play_sound(FAIL)
 
-        self.bullet_list.draw()
-
-        #desenez zombie bullet
-
-        self.zombie_bullet_list.draw()
-
-        #Desenez medkit
-
-        self.medkit_list.draw()
-
-        # End game
-        if self.zombie_health <= 0:
-            arcade.draw_text("Ai castigat", 230, 300, arcade.color.BLUEBERRY, 110)
-
-        if self.health <= 0:
-            arcade.draw_text("Ai pierdut", 230, 300, arcade.color.BLUEBERRY, 110)
+                arcade.draw_text("Ai pierdut", 230, 300, arcade.color.BLUEBERRY, 110)
+                self.game_done = True
+                self.menu_choice = 1
 
 
-        # Arrow
-        if self.is_locked and self.locked_angle is not None:
-            # Use locked angle
-            angle_to_use = self.locked_angle
-        else:
-            # Calculate angle from player to mouse position
-            player_x = self.player_sprite.center_x + 60
-            player_y = self.player_sprite.center_y - 25  # Adjust for better visual
-            angle_to_use = math.atan2(self.mouse_y - player_y, self.mouse_x - player_x)
+            # Arrow
+            if self.is_locked and self.locked_angle is not None:
+                # Use locked angle
+                angle_to_use = self.locked_angle
+            else:
+                # Calculate angle from player to mouse position
+                player_x = self.player_sprite.center_x + 60
+                player_y = self.player_sprite.center_y - 25  # Adjust for better visual
+                angle_to_use = math.atan2(self.mouse_y - player_y, self.mouse_x - player_x)
 
 
-        self.current_angle = angle_to_use
+            self.current_angle = angle_to_use
 
-        # Calculate end point of the aiming line
-        line_length = 150
-        start_x = self.player_sprite.center_x + 60
-        start_y = self.player_sprite.center_y - 25
-        end_x = start_x + math.cos(angle_to_use) * line_length
-        end_y = start_y + math.sin(angle_to_use) * line_length
+            # Calculate end point of the aiming line
+            line_length = 150
+            start_x = self.player_sprite.center_x + 60
+            start_y = self.player_sprite.center_y - 25
+            end_x = start_x + math.cos(angle_to_use) * line_length
+            end_y = start_y + math.sin(angle_to_use) * line_length
 
-        if self.turn == "player":  # Only show aiming line during player turn
-            color = arcade.color.RED if self.is_locked else arcade.color.YELLOW
-            arcade.draw_line(start_x, start_y, end_x, end_y, color, 3)
+            if self.turn == "player":  # Only show aiming line during player turn
+                color = arcade.color.RED if self.is_locked else arcade.color.YELLOW
+                arcade.draw_line(start_x, start_y, end_x, end_y, color, 3)
+
+
+        elif self.menu_choice == 3:
+
+            # TUTORIAL
+
+            draw_tutorial_objects()
+
+
+
 
 
 
@@ -326,15 +460,48 @@ class MyGame(arcade.Window):
 
         self.mouse_x = x
         self.mouse_y = y
-        if y <161:
-            self.set_mouse_visible(True)
+        if self.menu_choice == 1 or self.menu_choice == 3:
+            ...
         else:
-            self.set_mouse_visible(False)
+            if y <161:
+                self.set_mouse_visible(True)
+            else:
+                self.set_mouse_visible(False)
 
         # Daca nu vrem ca sa se vada cursorul mousului
 
 
     def on_mouse_press(self, x, y, button, modifiers):
+
+
+
+        if x > 300 and x < 700 and y > 300 and y < 380:
+            print("merge")
+            self.menu_choice = 2
+
+
+
+        if x > 300 and x < 700 and y >200 and y< 280:
+            self.menu_choice = 3
+
+
+        if x> 930 and x < 990 and y > 530 and y < 590:
+            self.menu_choice = 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         if self.turn == "dice":
 
@@ -417,6 +584,19 @@ class MyGame(arcade.Window):
 
 
     def on_update(self, delta_time):
+
+        if self.menu_choice == 1:
+            self.dice_list.update()
+            self.dice_sprite.center_x = 150
+            self.dice_sprite.center_y = 120
+
+            self.dice_sprite.angle += 2
+
+
+        if self.game_done == True:
+            for i in range(1,3):
+                time.sleep(1)
+
 
 
 

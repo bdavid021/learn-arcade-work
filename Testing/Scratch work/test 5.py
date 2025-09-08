@@ -63,7 +63,7 @@ class MyGame(arcade.Window):
 
     def on_update(self, delta_time):
         """ Called to update our objects. Happens approximately 60 times per second."""
-        self.ball.update()
+        self.ball.on_update()
 
 
 def main():
