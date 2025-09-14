@@ -81,6 +81,33 @@ def draw_main_menu():
     arcade.draw_text("TUTORIAL", 373, 220, arcade.color.BLACK, 50)
 
 
+    #DECORURI
+
+    x = 850
+    y = 100
+
+    arcade.draw_circle_filled(x - 80, y, 35, arcade.color.BRITISH_RACING_GREEN, 3)
+    arcade.draw_circle_filled(x + 50, y + 60, 50, arcade.color.CASTLETON_GREEN,3)
+    arcade.draw_circle_filled(x, y, 65, arcade.color.BOTTLE_GREEN, 3, )
+
+    arcade.draw_circle_outline(x - 80, y, 35, arcade.color.BLACK)
+    arcade.draw_circle_outline(x + 50, y + 60, 50, arcade.color.BLACK)
+    arcade.draw_circle_outline(x, y, 65, arcade.color.BLACK)
+
+
+
+    x2 = 150
+    y2 = 500
+
+
+
+    arcade.draw_circle_outline(x2 - 80, y2- 90, 35, arcade.color.BLACK)
+    arcade.draw_circle_outline(x2 + 20, y2 + 50, 50, arcade.color.BLACK)
+    arcade.draw_circle_outline(x2- 60, y2- 10, 65, arcade.color.BLACK)
+
+    arcade.draw_circle_filled(x2 - 80, y2 - 90, 35, arcade.color.BRITISH_RACING_GREEN)
+    arcade.draw_circle_filled(x2 + 20, y2 + 50, 50, arcade.color.CASTLETON_GREEN)
+    arcade.draw_circle_filled(x2 - 60, y2 - 10, 65, arcade.color.BOTTLE_GREEN)
 
 
 
@@ -227,6 +254,7 @@ class MyGame(arcade.Window):
 
 
 
+
         else:
             arcade.set_background_color(arcade.color.LIGHT_BLUE)
 
@@ -247,6 +275,11 @@ class MyGame(arcade.Window):
 
         # Copacei
 
+        #boschet
+        arcade.draw_circle_filled(570, 172, 35, arcade.color.BRITISH_RACING_GREEN)
+        arcade.draw_circle_filled(640, 172,60, arcade.color.BRITISH_RACING_GREEN)
+        arcade.draw_circle_filled(710, 152, 35, arcade.color.BRITISH_RACING_GREEN)
+
         arcade.draw_lrbt_rectangle_filled(70, 100, 161, 290, arcade.csscolor.BROWN)
         arcade.draw_lrbt_rectangle_outline(70, 100, 161, 290, arcade.csscolor.BLACK)
         arcade.draw_circle_filled(85, 290, 80, arcade.csscolor.DARK_GREEN)
@@ -263,6 +296,10 @@ class MyGame(arcade.Window):
 
         arcade.draw_lrbt_rectangle_filled(0, 1000, 0, 150, arcade.color.BROWN_NOSE)
 
+        # BUTON BACK
+        arcade.draw_lrbt_rectangle_filled(930, 990, 530, 590, arcade.color.LIGHT_RED_OCHRE)
+        arcade.draw_lrbt_rectangle_outline(930, 990, 530, 590, arcade.color.BLACK, 3)
+        arcade.draw_text("BACK", 935, 554, arcade.color.BLACK, 17)
 
 
     def setup(self):
@@ -394,15 +431,20 @@ class MyGame(arcade.Window):
 
                 arcade.play_sound(WIN)
 
-                arcade.draw_text("Ai castigat", 230, 300, arcade.color.BLUEBERRY, 110)
+                arcade.draw_text("Ai castigat! :)", 175, 305, arcade.color.BLACK, 110)
+                arcade.draw_text("Ai castigat! :)", 180, 300, arcade.color.BLUEBERRY, 110)
 
-                self.menu_choice = 1
+
                 self.game_done = True
+                self.menu_choice = 1
+
             if self.health <= 0:
 
                 arcade.play_sound(FAIL)
 
-                arcade.draw_text("Ai pierdut", 230, 300, arcade.color.BLUEBERRY, 110)
+                arcade.draw_text("Ai pierdut! :(", 175, 305, arcade.color.BLACK, 110)
+                arcade.draw_text("Ai pierdut! :(", 180, 300, arcade.color.BLUEBERRY, 110)
+
                 self.game_done = True
                 self.menu_choice = 1
 
@@ -473,27 +515,24 @@ class MyGame(arcade.Window):
 
     def on_mouse_press(self, x, y, button, modifiers):
 
+        if self.menu_choice == 1:
+
+            if x > 300 and x < 700 and y > 300 and y < 380:
+                print("merge")
+                self.menu_choice = 2
 
 
-        if x > 300 and x < 700 and y > 300 and y < 380:
-            print("merge")
-            self.menu_choice = 2
+
+            if x > 300 and x < 700 and y >200 and y< 280:
+                self.menu_choice = 3
 
 
+            if x> 930 and x < 990 and y > 530 and y < 590:
+                self.menu_choice = 1
 
-        if x > 300 and x < 700 and y >200 and y< 280:
-            self.menu_choice = 3
 
-
-        if x> 930 and x < 990 and y > 530 and y < 590:
+        if x > 930 and x < 990 and y > 530 and y < 590:
             self.menu_choice = 1
-
-
-
-
-
-
-
 
 
 
