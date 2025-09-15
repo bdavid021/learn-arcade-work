@@ -2,7 +2,7 @@ import arcade
 import random
 import time
 import math
-
+import sys
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
@@ -80,6 +80,11 @@ def draw_main_menu():
     arcade.draw_lrbt_rectangle_outline(300, 700, 200, 280, arcade.color.BLACK, 3)
     arcade.draw_text("TUTORIAL", 373, 220, arcade.color.BLACK, 50)
 
+    #BUTON BACK
+    arcade.draw_lrbt_rectangle_filled(930, 990, 530, 590, arcade.color.LIGHT_RED_OCHRE)
+    arcade.draw_lrbt_rectangle_outline(930, 990, 530, 590, arcade.color.BLACK, 3)
+    arcade.draw_text("BACK", 935, 554, arcade.color.BLACK, 17)
+
 
     #DECORURI
 
@@ -156,6 +161,7 @@ class MyGame(arcade.Window):
         self.player_base_attack = 10
         self.player_double_damage_attack = self.player_base_attack
         self.dodge_chance = 10
+        self.dodge_chance_bool = False
         self.double_damage_chance = False
 
         #ZOMBIE SPRITE
@@ -181,7 +187,7 @@ class MyGame(arcade.Window):
         self.medkit_list = None
         self.medkit_sprite = None
 
-        #Aiming Arror
+        #Aiming Arrow
 
         self.mouse_x = 400
         self.mouse_y = 200
@@ -211,24 +217,36 @@ class MyGame(arcade.Window):
 
         # Afisez viata zombie
 
+        arcade.draw_text(f"{self.zombie_health} HP", 789, 349, arcade.color.BLACK, 25)
         arcade.draw_text(f"{self.zombie_health} HP", 790, 350, arcade.color.ARCADE_GREEN, 25)
+
+        arcade.draw_text(f"{self.zombie_base_attack} DMG", 789, 389, arcade.color.BLACK, 25)
         arcade.draw_text(f"{self.zombie_base_attack} DMG", 790, 390, arcade.color.ARCADE_GREEN, 25)
 
         # Afisez viata om
-
+        arcade.draw_text(f"{self.health} HP", 129, 349, arcade.color.BLACK, 25)
         arcade.draw_text(f"{self.health} HP", 130, 350, arcade.color.DARK_RED, 25)
-        arcade.draw_text(self.text, 300, 400, arcade.color.BLACK, 30)
-        if self.double_damage_chance == True:
 
+        #Afisez damage om
+        if self.double_damage_chance == True:
+            arcade.draw_text(f"{self.player_base_attack * 2} DMG", 129, 389, arcade.color.BLACK, 25)
             arcade.draw_text(f"{self.player_base_attack * 2} DMG", 130, 390, arcade.color.DARK_RED, 25)
         else:
+            arcade.draw_text(f"{self.player_base_attack} DMG", 129, 389, arcade.color.BLACK, 25)
             arcade.draw_text(f"{self.player_base_attack} DMG", 130, 390, arcade.color.DARK_RED, 25)
 
         # Afisez statisitici importante, colt stanga sus =============
 
-        arcade.draw_text(f"Sansa ta de a te ferii este {self.dodge_chance} ", 20, 570, arcade.color.BLACK, 20)
-        arcade.draw_text(f"Tura aceasta dai damaga dublu: {self.double_damage_chance} ", 20, 540, arcade.color.BLACK,
+        arcade.draw_text(f"Aceasta tura te feresti: {self.dodge_chance_bool} ", 20, 570, arcade.color.FRENCH_LIME, 20)
+        arcade.draw_text(f"Aceasta tura te feresti: {self.dodge_chance_bool} ", 19, 569, arcade.color.BLACK, 20)
+
+        arcade.draw_text(f"Damage dublu: {self.double_damage_chance} ", 20, 540, arcade.color.CELADON_BLUE,
                          20)
+        arcade.draw_text(f"Damage dublu: {self.double_damage_chance} ", 19, 539, arcade.color.BLACK,
+                         20)
+        # Afisez numarul random
+        arcade.draw_text(self.text, 20, 500, arcade.color.CAPUT_MORTUUM, 30)
+        arcade.draw_text(self.text, 19, 499, arcade.color.BLACK, 30)
 
         #Afisez buton exit main-menu
 
@@ -309,7 +327,7 @@ class MyGame(arcade.Window):
 
         self.player_list = arcade.SpriteList()
 
-        self.player_sprite = arcade.Sprite("character_maleAdventurer_walk7.png", SPRITE_SCALING)
+        self.player_sprite = arcade.Sprite("character_maleAdventurer_side.png", SPRITE_SCALING)
 
         self.player_sprite.center_x  = 162
         self.player_sprite.center_y  = 255
@@ -366,7 +384,7 @@ class MyGame(arcade.Window):
             #MAIN MENU
 
             draw_main_menu()
-
+            self.game_done = False
 
             self.dice_list.draw()
 
@@ -389,9 +407,11 @@ class MyGame(arcade.Window):
             if self.turn == "dice":
                 #time.sleep(0.9)
 
-                arcade.draw_lrbt_rectangle_filled(self.left+self.right, self.right+self.right, self.top, self.bottom, arcade.color.LIGHT_BLUE)
+                arcade.draw_lrbt_rectangle_filled(self.left+self.right, self.right+self.right, self.top, self.bottom, arcade.color.WHITE)
                 arcade.draw_lrbt_rectangle_outline(self.left+self.right, self.right+self.right, self.top, self.bottom, arcade.color.BLACK, 3)
-                arcade.draw_text("Da cu zarul", 320, 70, arcade.color.BLACK, 27)
+                arcade.draw_text("Dă cu zarul", 320, 70, arcade.color.BLACK, 27)
+
+
             if self.turn == "player":
                 arcade.draw_lrbt_rectangle_filled(self.left, self.right, self.top, self.bottom, arcade.color.PEAR)
                 arcade.draw_lrbt_rectangle_outline(self.left, self.right, self.top, self.bottom, arcade.color.BLACK, 3)
@@ -513,12 +533,7 @@ class MyGame(arcade.Window):
             else:
                 self.set_mouse_visible(False)
 
-        """
-        # BUTON BACK
-    arcade.draw_lrbt_rectangle_filled(930, 990, 530, 590, arcade.color.LIGHT_RED_OCHRE)
-    arcade.draw_lrbt_rectangle_outline(930, 990, 530, 590, arcade.color.BLACK, 3)
-    arcade.draw_text("BACK", 935, 554, arcade.color.BLACK, 17)
-        """
+
         if x> 930 and y > 530 and x < 990 and y < 590:
             self.set_mouse_visible(True)
 
@@ -530,7 +545,7 @@ class MyGame(arcade.Window):
 
 
         if x > 300 and x < 700 and y > 300 and y < 380:
-            print("merge")
+
             reset_game = True
             self.menu_choice = 2
             self.turn = "dice"
@@ -542,13 +557,8 @@ class MyGame(arcade.Window):
 
             self.zombie_base_attack = 10
 
-            """
-            
-            self.health = 100
-            self.zombie_health = 150
-            self.turn = "dice"
-            """
-
+        if x> 930 and x < 990 and y > 530 and y < 590 and self.menu_choice == 1:
+            arcade.close_window()
 
 
 
@@ -574,8 +584,12 @@ class MyGame(arcade.Window):
 
                 arcade.play_sound(DICE)
 
-
+                #Dice going
                 self.random_number = random.randint(1, 6)
+                #dodge calculating
+
+                self.dodge_chance = random.randint(1, 10)
+
                 self.text = f"Numar random: {self.random_number}"
                 if self.random_number % 2 == 0:
                     self.double_damage_chance = True
@@ -592,7 +606,7 @@ class MyGame(arcade.Window):
                     self.spawn_medkit = True
                     medkit = arcade.Sprite("health-red 32px.png", SPRITE_SCALING)
 
-                    medkit.center_x = random.randint(150, 990)
+                    medkit.center_x = random.randint(150, 800)
                     medkit.center_y = random.randint(250, 580)
 
                     self.medkit_list.append(medkit)
@@ -606,16 +620,16 @@ class MyGame(arcade.Window):
 
 
 
-                print(medkit_spawn_change)
 
 
-                print(self.turn)
+
+
 
         #Buronul din stanga de atac ------
 
         if self.turn == "player":
             if self.left < x < self.right and y > self.top and y < self.bottom:
-                print("Buton apăsat!", self.turn)
+
                 bullet = arcade.Sprite("ballBlack_04.png", BULLET_SCALING)
                 arcade.play_sound(THROW)
 
@@ -642,7 +656,7 @@ class MyGame(arcade.Window):
         #Butonul din dreapta de zombi (pt test)
 
         if x > 550 and x < 750 and y > self.top and y < self.bottom:
-            ...
+            print("Esti slaaaab")
 
 
 
@@ -656,7 +670,7 @@ class MyGame(arcade.Window):
 
             self.dice_sprite.angle += 2
 
-
+        #game timer after end game
         if self.game_done == True:
             for i in range(1,3):
                 time.sleep(1)
@@ -689,9 +703,12 @@ class MyGame(arcade.Window):
 
 
             if self.dodge_chance == 1:
+                self.dodge_chance_bool = True
                 print("evade")
             else:
                 hit_list = arcade.check_for_collision_with_list(zombie_bullet, self.player_list)
+                self.dodge_chance_bool = False
+
 
 
                 if len(hit_list) > 0:
@@ -705,10 +722,16 @@ class MyGame(arcade.Window):
                     else:
 
                         self.health-= self.zombie_base_attack
+                    if len(hit_list) > 0:
+                        self.zombie_done = False
+                    else:
+                        self.zombie_done = True
 
             player_hit_list = arcade.check_for_collision_with_list(zombie_bullet, self.bullet_list)
 
+
             if len(player_hit_list) > 0:
+
                 zombie_bullet.remove_from_sprite_lists()
                 self.bullet.remove_from_sprite_lists()
 
@@ -741,7 +764,7 @@ class MyGame(arcade.Window):
 
 
         if self.turn == "zombie":
-            print("merge")
+
 
             zombie_bullet = arcade.Sprite("ballBlue_07.png", BULLET_SCALING)
 
@@ -749,13 +772,13 @@ class MyGame(arcade.Window):
             zombie_bullet.center_y = 190 + random.randint(10,50) - random.randint(10,40)
             zombie_bullet.change_x = -random.randint(2,8)
             self.zombie_bullet_list.append(zombie_bullet)
-            self.dodge_chance = random.randint(1, 10)
+
 
             self.zombie_done = True
 
 
 
-            print(self.turn)
+
 
 
 
