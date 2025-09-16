@@ -169,7 +169,7 @@ class MyGame(arcade.Window):
         self.zombie_sprite = None
 
         #zombie characteristics
-
+        self.zombie_did_shoot = True
 
         self.zombie_base_attack = 0
 
@@ -404,7 +404,7 @@ class MyGame(arcade.Window):
 
 
             #butoanele-------------
-            if self.turn == "dice":
+            if self.turn == "dice" and self.zombie_did_shoot == True:
                 #time.sleep(0.9)
 
                 arcade.draw_lrbt_rectangle_filled(self.left+self.right, self.right+self.right, self.top, self.bottom, arcade.color.WHITE)
@@ -577,7 +577,7 @@ class MyGame(arcade.Window):
 
 
 
-        if self.turn == "dice":
+        if self.turn == "dice" and self.zombie_did_shoot == True:
 
             if 300 < x < self.right * 2 and y > self.top and y < self.bottom or arcade.key.SPACE == True:
 
@@ -611,7 +611,7 @@ class MyGame(arcade.Window):
 
                     self.medkit_list.append(medkit)
 
-
+                self.zombie_did_shoot = False
                 self.zombie_base_attack = random.randint(10, 20)
 
 
@@ -646,6 +646,7 @@ class MyGame(arcade.Window):
 
                 self.player_done = True
                 self.zombie_done = False
+
 
         #Butonul din mijloc de zar ----
 
@@ -704,6 +705,7 @@ class MyGame(arcade.Window):
 
             if self.dodge_chance == 1:
                 self.dodge_chance_bool = True
+                self.zombie_did_shoot = True
                 print("evade")
             else:
                 hit_list = arcade.check_for_collision_with_list(zombie_bullet, self.player_list)
@@ -712,6 +714,8 @@ class MyGame(arcade.Window):
 
 
                 if len(hit_list) > 0:
+                    self.zombie_did_shoot = True
+
 
                     zombie_bullet.remove_from_sprite_lists()
 
@@ -722,16 +726,13 @@ class MyGame(arcade.Window):
                     else:
 
                         self.health-= self.zombie_base_attack
-                    if len(hit_list) > 0:
-                        self.zombie_done = False
-                    else:
-                        self.zombie_done = True
+
 
             player_hit_list = arcade.check_for_collision_with_list(zombie_bullet, self.bullet_list)
 
 
             if len(player_hit_list) > 0:
-
+                self.zombie_did_shoot = True
                 zombie_bullet.remove_from_sprite_lists()
                 self.bullet.remove_from_sprite_lists()
 
@@ -750,6 +751,8 @@ class MyGame(arcade.Window):
 
 
 
+
+
         if self.dice_done == True:
             self.turn = "player"
 
@@ -763,6 +766,7 @@ class MyGame(arcade.Window):
 
 
 
+
         if self.turn == "zombie":
 
 
@@ -772,15 +776,7 @@ class MyGame(arcade.Window):
             zombie_bullet.center_y = 190 + random.randint(10,50) - random.randint(10,40)
             zombie_bullet.change_x = -random.randint(2,8)
             self.zombie_bullet_list.append(zombie_bullet)
-
-
             self.zombie_done = True
-
-
-
-
-
-
 
 
 
