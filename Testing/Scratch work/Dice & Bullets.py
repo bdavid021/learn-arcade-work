@@ -12,12 +12,17 @@ BULLET_SPEED =6
 
 #sounds
 DICE = arcade.load_sound("sounds/dice-142528.mp3")
-THROW = arcade.load_sound("sounds/fireball-whoosh-1-179125.mp3")
+THROW = arcade.load_sound("sounds/retro-game-shot-152052.mp3")
 FAIL = arcade.load_sound("sounds/cartoon-fail-trumpet-278822.mp3")
 WIN = arcade.load_sound("sounds/you-win-sequence-3-183950.mp3")
 ZOMBIE_HURT = arcade.load_sound("sounds/retro-hurt-2-236675.mp3")
 ELEVATOR_MUSIC = arcade.load_sound("sounds/jazz-lounge-elevator-music-332339.mp3")
-
+HIGH_DAMAGE_LOST = arcade.load_sound("sounds/explosion-8-bit-11-314691.mp3")
+DAMAGE_LOST = arcade.load_sound("sounds/hurt_c_08-102842.mp3")
+HEAL = arcade.load_sound("sounds/classic-game-action-positive-10-224398.mp3")
+UI = arcade.load_sound("sounds/confirm-tap-394001.mp3")
+BULLETS_COLLIDING = arcade.load_sound("sounds/funny-boing-flexatone-wobble-352710.mp3")
+EVADE = arcade.load_sound("sounds/classic-game-action-positive-1-224407.mp3")
 
 #DRAWING THINGS
 
@@ -163,6 +168,8 @@ class MyGame(arcade.Window):
         self.dodge_chance = 10
         self.dodge_chance_bool = False
         self.double_damage_chance = False
+        self.triple_damage_chance = False
+
 
         #ZOMBIE SPRITE
         self.zombie_list = None
@@ -228,7 +235,10 @@ class MyGame(arcade.Window):
         arcade.draw_text(f"{self.health} HP", 130, 350, arcade.color.DARK_RED, 25)
 
         #Afisez damage om
-        if self.double_damage_chance == True:
+        if self.triple_damage_chance == True and self.double_damage_chance == False:
+            arcade.draw_text(f"{self.player_base_attack * 3} DMG", 129, 389, arcade.color.BLACK, 25)
+            arcade.draw_text(f"{self.player_base_attack * 3} DMG", 130, 390, arcade.color.DARK_RED, 25)
+        elif self.double_damage_chance == True:
             arcade.draw_text(f"{self.player_base_attack * 2} DMG", 129, 389, arcade.color.BLACK, 25)
             arcade.draw_text(f"{self.player_base_attack * 2} DMG", 130, 390, arcade.color.DARK_RED, 25)
         else:
@@ -276,6 +286,7 @@ class MyGame(arcade.Window):
             arcade.draw_circle_filled(x2 - 70, y2, 35, arcade.color.YANKEES_BLUE)
             arcade.draw_circle_filled(x2, y2, 60, arcade.color.YANKEES_BLUE)
             arcade.draw_circle_filled(x2 + 70, y2, 35, arcade.color.YANKEES_BLUE)
+
 
 
 
@@ -367,7 +378,7 @@ class MyGame(arcade.Window):
         self.spawn_medkit = False
 
         if self.menu_choice == 1 :
-            player = arcade.play_sound(ELEVATOR_MUSIC)
+            player = arcade.play_sound(ELEVATOR_MUSIC, volume= 0.15, loop=True)
 
 
 
@@ -545,8 +556,8 @@ class MyGame(arcade.Window):
 
 
         if x > 300 and x < 700 and y > 300 and y < 380:
+            arcade.play_sound(UI)
 
-            reset_game = True
             self.menu_choice = 2
             self.turn = "dice"
             self.dice_done = False
@@ -558,15 +569,18 @@ class MyGame(arcade.Window):
             self.zombie_base_attack = 10
 
         if x> 930 and x < 990 and y > 530 and y < 590 and self.menu_choice == 1:
+            arcade.play_sound(UI)
             arcade.close_window()
 
 
 
         if x > 300 and x < 700 and y >200 and y< 280:
+            arcade.play_sound(UI)
             self.menu_choice = 3
 
 
         if x> 930 and x < 990 and y > 530 and y < 590:
+            arcade.play_sound(UI)
             self.menu_choice = 1
 
 
@@ -589,6 +603,8 @@ class MyGame(arcade.Window):
                 #dodge calculating
 
                 self.dodge_chance = random.randint(1, 10)
+                if self.dodge_chance == 1:
+                    arcade.play_sound(EVADE)
 
                 self.text = f"Numar random: {self.random_number}"
                 if self.random_number % 2 == 0:
@@ -596,6 +612,14 @@ class MyGame(arcade.Window):
                     self.player_double_damage_attack = self.player_base_attack * 2
                 else:
                     self.double_damage_chance = False
+
+
+                if self.random_number == 6:
+                    self.triple_damage_chance = True
+                    self.double_damage_chance = False
+                    self.player_triple_damage_attack = self.player_base_attack * 3
+                else:
+                    self.triple_damage_chance = False
 
                 self.dice_done = True
                 self.player_done = False
@@ -704,6 +728,7 @@ class MyGame(arcade.Window):
 
 
             if self.dodge_chance == 1:
+
                 self.dodge_chance_bool = True
                 self.zombie_did_shoot = True
                 print("evade")
@@ -716,16 +741,17 @@ class MyGame(arcade.Window):
                 if len(hit_list) > 0:
                     self.zombie_did_shoot = True
 
-
                     zombie_bullet.remove_from_sprite_lists()
 
+                    self.health -= self.zombie_base_attack
 
-                    if self.double_damage_chance == True:
-
-                        self.health -= self.zombie_base_attack
+                    if self.zombie_base_attack >= 15:
+                        arcade.play_sound(HIGH_DAMAGE_LOST)
                     else:
+                        arcade.play_sound(DAMAGE_LOST, volume = 1.5)
 
-                        self.health-= self.zombie_base_attack
+
+
 
 
             player_hit_list = arcade.check_for_collision_with_list(zombie_bullet, self.bullet_list)
@@ -733,17 +759,23 @@ class MyGame(arcade.Window):
 
             if len(player_hit_list) > 0:
                 self.zombie_did_shoot = True
+                arcade.play_sound(BULLETS_COLLIDING)
                 zombie_bullet.remove_from_sprite_lists()
                 self.bullet.remove_from_sprite_lists()
 
 
+
         self.zombie_bullet_list.update()
+
+
+        #MEDKIT ------ HITBOX
 
         for medkitlist in self.medkit_list:
 
             hit_list = arcade.check_for_collision_with_list(medkitlist, self.bullet_list)
 
             if len(hit_list) > 0:
+                arcade.play_sound(HEAL)
                 self.health = self.health + 20
                 self.bullet.remove_from_sprite_lists()
                 medkitlist.remove_from_sprite_lists()
