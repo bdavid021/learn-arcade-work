@@ -2,7 +2,7 @@ import arcade
 import random
 import time
 import math
-import sys
+
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
@@ -13,7 +13,7 @@ BULLET_SPEED =6
 #sounds
 DICE = arcade.load_sound("sounds/dice-142528.mp3")
 THROW = arcade.load_sound("sounds/retro-game-shot-152052.mp3")
-FAIL = arcade.load_sound("sounds/cartoon-fail-trumpet-278822.mp3")
+FAIL = arcade.load_sound("sounds/dead-8bit-41400.mp3")
 WIN = arcade.load_sound("sounds/you-win-sequence-3-183950.mp3")
 ZOMBIE_HURT = arcade.load_sound("sounds/retro-hurt-2-236675.mp3")
 ELEVATOR_MUSIC = arcade.load_sound("sounds/jazz-lounge-elevator-music-332339.mp3")
@@ -250,9 +250,15 @@ class MyGame(arcade.Window):
         arcade.draw_text(f"Aceasta tura te feresti: {self.dodge_chance_bool} ", 20, 570, arcade.color.FRENCH_LIME, 20)
         arcade.draw_text(f"Aceasta tura te feresti: {self.dodge_chance_bool} ", 19, 569, arcade.color.BLACK, 20)
 
-        arcade.draw_text(f"Damage dublu: {self.double_damage_chance} ", 20, 540, arcade.color.CELADON_BLUE,
-                         20)
-        arcade.draw_text(f"Damage dublu: {self.double_damage_chance} ", 19, 539, arcade.color.BLACK,
+        if self.triple_damage_chance == True:
+            arcade.draw_text(f"Boosted Damage: {self.triple_damage_chance} ", 20, 540, arcade.color.CELADON_BLUE,
+                             20)
+            arcade.draw_text(f"Boosted Damage: {self.triple_damage_chance} ", 19, 539, arcade.color.BLACK,
+                             20)
+        else:
+            arcade.draw_text(f"Boosted Damage: {self.double_damage_chance} ", 20, 540, arcade.color.CELADON_BLUE,
+                             20)
+            arcade.draw_text(f"Boosted Damage: {self.double_damage_chance} ", 19, 539, arcade.color.BLACK,
                          20)
         # Afisez numarul random
         arcade.draw_text(self.text, 20, 500, arcade.color.CAPUT_MORTUUM, 30)
@@ -271,7 +277,42 @@ class MyGame(arcade.Window):
         # Peisaj in caz de lovitura mare
 
         # Scena
-        if self.zombie_base_attack >= 15:
+        if self.triple_damage_chance == True and self.zombie_base_attack >= 15:
+            arcade.set_background_color(arcade.color.FLAX)
+            arcade.draw_lrbt_rectangle_filled(500,1000,150,600, arcade.color.SLATE_GRAY)
+            # Norisori
+            x = 300
+            y = 500
+
+            arcade.draw_circle_filled(x - 70, y, 35, arcade.color.WHITE)
+            arcade.draw_circle_filled(x, y, 60, arcade.color.WHITE)
+            arcade.draw_circle_filled(x + 70, y, 35, arcade.color.WHITE)
+
+
+            x2 = 700
+            y2 = 420
+            arcade.draw_circle_filled(x2 - 70, y2, 35, arcade.color.YANKEES_BLUE)
+            arcade.draw_circle_filled(x2, y2, 60, arcade.color.YANKEES_BLUE)
+            arcade.draw_circle_filled(x2 + 70, y2, 35, arcade.color.YANKEES_BLUE)
+        elif self.triple_damage_chance == True:
+            arcade.set_background_color(arcade.color.FLAX)
+
+            # Norisori
+
+            x = 300
+            y = 500
+
+            arcade.draw_circle_filled(x - 70, y, 35, arcade.color.WHITE)
+            arcade.draw_circle_filled(x, y, 60, arcade.color.WHITE)
+            arcade.draw_circle_filled(x + 70, y, 35, arcade.color.WHITE)
+
+            x2 = 700
+            y2 = 420
+            arcade.draw_circle_filled(x2 - 70, y2, 35, arcade.color.WHITE)
+            arcade.draw_circle_filled(x2, y2, 60, arcade.color.WHITE)
+            arcade.draw_circle_filled(x2 + 70, y2, 35, arcade.color.WHITE)
+
+        elif self.zombie_base_attack >= 15:
             arcade.set_background_color(arcade.color.SLATE_GRAY)
 
             x = 300
@@ -558,6 +599,8 @@ class MyGame(arcade.Window):
         if x > 300 and x < 700 and y > 300 and y < 380:
             arcade.play_sound(UI)
 
+            # RESET GAME TO START
+
             self.menu_choice = 2
             self.turn = "dice"
             self.dice_done = False
@@ -565,8 +608,15 @@ class MyGame(arcade.Window):
             self.zombie_done = False
             self.health = 100
             self.zombie_health = 150
-
+            self.triple_damage_chance = False
             self.zombie_base_attack = 10
+            self.medkit_list.clear()
+            self.zombie_bullet_list.clear()
+            self.bullet_list.clear()
+            self.zombie_did_shoot = True
+
+            self.text = None
+
 
         if x> 930 and x < 990 and y > 530 and y < 590 and self.menu_choice == 1:
             arcade.play_sound(UI)
@@ -589,7 +639,7 @@ class MyGame(arcade.Window):
 
 
 
-
+#******************** Buton DICE **************
 
         if self.turn == "dice" and self.zombie_did_shoot == True:
 
@@ -604,6 +654,7 @@ class MyGame(arcade.Window):
 
                 self.dodge_chance = random.randint(1, 10)
                 if self.dodge_chance == 1:
+                    self.dodge_chance_bool = True
                     arcade.play_sound(EVADE)
 
                 self.text = f"Numar random: {self.random_number}"
@@ -697,7 +748,7 @@ class MyGame(arcade.Window):
 
         #game timer after end game
         if self.game_done == True:
-            for i in range(1,3):
+            for i in range(1,5):
                 time.sleep(1)
 
 
@@ -713,7 +764,10 @@ class MyGame(arcade.Window):
 
             if len(hit_list) > 0:
                 self.bullet.remove_from_sprite_lists()
-                if self.double_damage_chance == True:
+                if self.triple_damage_chance == True:
+                    self.zombie_health -= self.player_triple_damage_attack
+                    arcade.play_sound(ZOMBIE_HURT)
+                elif self.double_damage_chance == True:
                     self.zombie_health -= self.player_double_damage_attack
                     arcade.play_sound(ZOMBIE_HURT)
                 else:
