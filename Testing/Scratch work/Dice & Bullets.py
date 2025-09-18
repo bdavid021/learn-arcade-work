@@ -859,8 +859,14 @@ class MyGame(arcade.Window):
             zombie_bullet = arcade.Sprite("ballBlue_07.png", BULLET_SCALING)
 
             zombie_bullet.center_x = self.zombie_sprite.center_x - 50
-            zombie_bullet.center_y = 190 + random.randint(10,50) - random.randint(10,40)
+            zombie_bullet.center_y = 190 + random.randint(10,100) - random.randint(10,70)
             zombie_bullet.change_x = -random.randint(2,8)
+            if zombie_bullet.center_y < 190 and zombie_bullet.center_y >= 161:
+                print("foot")
+            elif zombie_bullet.center_y <230 and zombie_bullet.center_y >= 190:
+                print("body")
+            elif zombie_bullet.center_y <290 and zombie_bullet.center_y >= 230:
+                print("head")
             self.zombie_bullet_list.append(zombie_bullet)
             self.zombie_done = True
 
