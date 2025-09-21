@@ -170,6 +170,19 @@ class MyGame(arcade.Window):
         self.double_damage_chance = False
         self.triple_damage_chance = False
 
+        #Body damage
+
+        self.head_damage = False
+        self.body_damage = False
+        self.foot_damage = False
+
+        self.sprite_damage_chance = None
+
+
+
+
+        self.health_less_than_last_turn = self.health
+
 
         #ZOMBIE SPRITE
         self.zombie_list = None
@@ -177,6 +190,7 @@ class MyGame(arcade.Window):
 
         #zombie characteristics
         self.zombie_did_shoot = True
+        self.zombie_did_not_missed = False
 
         self.zombie_base_attack = 0
 
@@ -193,6 +207,17 @@ class MyGame(arcade.Window):
 
         self.medkit_list = None
         self.medkit_sprite = None
+
+        #DAMAGED BODY PARTS SPRITE
+
+        self.head_damaged_list = None
+        self.head_damaged_sprite = None
+
+        self.body_damaged_list = None
+        self.body_damaged_sprite = None
+
+        self.foot_damaged_list = None
+        self.foot_damaged_sprite = None
 
         #Aiming Arrow
 
@@ -385,6 +410,27 @@ class MyGame(arcade.Window):
         self.player_sprite.center_y  = 255
         self.player_list.append(self.player_sprite)
 
+
+        self.head_damaged_list = arcade.SpriteList()
+        self.head_damaged_sprite = arcade.Sprite("sprites/head_damaged_no_bg.png", SPRITE_SCALING-0.75)
+        self.head_damaged_sprite.center_y = 465
+        self.head_damaged_sprite.center_x = 40
+        self.head_damaged_list.append(self.head_damaged_sprite)
+
+        self.body_damaged_list = arcade.SpriteList()
+        self.body_damaged_sprite = arcade.Sprite("sprites/body_damaged_no_bg.png", SPRITE_SCALING-0.75)
+        self.body_damaged_sprite.center_y = 432
+        self.body_damaged_sprite.center_x = 40
+        self.body_damaged_list.append(self.body_damaged_sprite)
+
+        self.foot_damaged_list = arcade.SpriteList()
+        self.foot_damaged_sprite = arcade.Sprite("sprites/leg_damaged_no_bg (1).png", SPRITE_SCALING - 0.75)
+        self.foot_damaged_sprite.center_y = 410
+        self.foot_damaged_sprite.center_x = 45
+        self.foot_damaged_list.append(self.foot_damaged_sprite)
+
+
+
         #ZOMBIE
 
         self.zombie_list = arcade.SpriteList()
@@ -482,6 +528,24 @@ class MyGame(arcade.Window):
             #desenez player
 
             self.player_list.draw()
+
+            if self.foot_damage == True:
+                self.foot_damaged_list.draw()
+            else:
+                self.foot_damaged_sprite = arcade.SpriteList()
+
+            if self.body_damage == True:
+                self.body_damaged_list.draw()
+            else:
+                self.body_damaged_sprite = arcade.SpriteList()
+
+            if self.head_damage == True:
+                self.head_damaged_list.draw()
+            else:
+                self.head_damaged_sprite = arcade.SpriteList()
+
+
+
 
             #desenez zombie
 
@@ -613,7 +677,12 @@ class MyGame(arcade.Window):
             self.medkit_list.clear()
             self.zombie_bullet_list.clear()
             self.bullet_list.clear()
+
             self.zombie_did_shoot = True
+
+            self.foot_damaged_sprite = arcade.SpriteList()
+            self.body_damaged_sprite = arcade.SpriteList()
+            self.head_damaged_sprite = arcade.SpriteList()
 
             self.text = None
 
@@ -675,6 +744,9 @@ class MyGame(arcade.Window):
                 self.dice_done = True
                 self.player_done = False
 
+
+                # MEDKIT SPAWN CHANCE
+
                 medkit_spawn_change = random.randint(1, 10)
 
                 if medkit_spawn_change == 1:
@@ -723,7 +795,6 @@ class MyGame(arcade.Window):
                 self.zombie_done = False
 
 
-        #Butonul din mijloc de zar ----
 
 
 
@@ -760,19 +831,25 @@ class MyGame(arcade.Window):
         for self.bullet in self.bullet_list:
             hit_list = arcade.check_for_collision_with_list(self.bullet, self.zombie_list)
 
-            hit_list_zombie_bullet =  arcade.check_for_collision_with_list(self.bullet, self.zombie_bullet_list)
+
 
             if len(hit_list) > 0:
                 self.bullet.remove_from_sprite_lists()
                 if self.triple_damage_chance == True:
                     self.zombie_health -= self.player_triple_damage_attack
                     arcade.play_sound(ZOMBIE_HURT)
+                    self.zombie_did_not_missed = True
+
+
+
                 elif self.double_damage_chance == True:
                     self.zombie_health -= self.player_double_damage_attack
                     arcade.play_sound(ZOMBIE_HURT)
+                    self.zombie_did_not_missed = True
                 else:
                     self.zombie_health -= self.player_base_attack
                     arcade.play_sound(ZOMBIE_HURT)
+                    self.zombie_did_not_missed = True
 
 
 
@@ -785,7 +862,7 @@ class MyGame(arcade.Window):
 
                 self.dodge_chance_bool = True
                 self.zombie_did_shoot = True
-                print("evade")
+
             else:
                 hit_list = arcade.check_for_collision_with_list(zombie_bullet, self.player_list)
                 self.dodge_chance_bool = False
@@ -794,7 +871,7 @@ class MyGame(arcade.Window):
 
                 if len(hit_list) > 0:
                     self.zombie_did_shoot = True
-
+                    self.zombie_did_not_missed = True
                     zombie_bullet.remove_from_sprite_lists()
 
                     self.health -= self.zombie_base_attack
@@ -814,6 +891,9 @@ class MyGame(arcade.Window):
             if len(player_hit_list) > 0:
                 self.zombie_did_shoot = True
                 arcade.play_sound(BULLETS_COLLIDING)
+
+                self.zombie_did_not_missed = True
+
                 zombie_bullet.remove_from_sprite_lists()
                 self.bullet.remove_from_sprite_lists()
 
@@ -829,6 +909,11 @@ class MyGame(arcade.Window):
             hit_list = arcade.check_for_collision_with_list(medkitlist, self.bullet_list)
 
             if len(hit_list) > 0:
+                self.body_damage = False
+                self.foot_damage = False
+                self.head_damage = False
+
+
                 arcade.play_sound(HEAL)
                 self.health = self.health + 20
                 self.bullet.remove_from_sprite_lists()
@@ -859,16 +944,40 @@ class MyGame(arcade.Window):
             zombie_bullet = arcade.Sprite("ballBlue_07.png", BULLET_SCALING)
 
             zombie_bullet.center_x = self.zombie_sprite.center_x - 50
-            zombie_bullet.center_y = 190 + random.randint(10,100) - random.randint(10,70)
+            zombie_bullet.center_y = 190 + random.randint(10,100) - random.randint(10,60)
             zombie_bullet.change_x = -random.randint(2,8)
-            if zombie_bullet.center_y < 190 and zombie_bullet.center_y >= 161:
-                print("foot")
-            elif zombie_bullet.center_y <230 and zombie_bullet.center_y >= 190:
-                print("body")
-            elif zombie_bullet.center_y <290 and zombie_bullet.center_y >= 230:
-                print("head")
+
+            # Damaged Zone calculation
+            if self.health_less_than_last_turn > self.health and self.dodge_chance_bool == False:
+                print("less health")
+
+
+            if self.health_less_than_last_turn > self.health:
+                self.zombie_did_not_missed = False
+                if zombie_bullet.center_y < 190 and zombie_bullet.center_y >= 161:
+                    print("foot")
+                    self.sprite_damage_chance = random.randint(1,1)
+                    if self.sprite_damage_chance == 1:
+                        self.foot_damage = True
+                        print("feet damaged")
+                elif zombie_bullet.center_y <230 and zombie_bullet.center_y >= 190:
+                    print("body")
+                    self.sprite_damage_chance = random.randint(1, 1)
+                    if self.sprite_damage_chance == 1:
+                        self.body_damage = True
+                        print("body damaged")
+                elif zombie_bullet.center_y <290 and zombie_bullet.center_y >= 230:
+                    print("head")
+                    self.sprite_damage_chance = random.randint(1, 1)
+                    if self.sprite_damage_chance == 1:
+                        self.head_damage = True
+                        print("head damaged")
+            else:
+                print("missed")
             self.zombie_bullet_list.append(zombie_bullet)
             self.zombie_done = True
+            self.health_less_than_last_turn = self.health
+            print(self.health_less_than_last_turn)
 
 
 
