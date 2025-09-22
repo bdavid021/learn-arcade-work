@@ -170,6 +170,8 @@ class MyGame(arcade.Window):
         self.double_damage_chance = False
         self.triple_damage_chance = False
 
+        self.bullet_speed = 6
+
         #Body damage
 
         self.head_damage = False
@@ -260,6 +262,8 @@ class MyGame(arcade.Window):
         arcade.draw_text(f"{self.health} HP", 130, 350, arcade.color.DARK_RED, 25)
 
         #Afisez damage om
+
+
         if self.triple_damage_chance == True and self.double_damage_chance == False:
             arcade.draw_text(f"{self.player_base_attack * 3} DMG", 129, 389, arcade.color.BLACK, 25)
             arcade.draw_text(f"{self.player_base_attack * 3} DMG", 130, 390, arcade.color.DARK_RED, 25)
@@ -272,8 +276,22 @@ class MyGame(arcade.Window):
 
         # Afisez statisitici importante, colt stanga sus =============
 
-        arcade.draw_text(f"Aceasta tura te feresti: {self.dodge_chance_bool} ", 20, 570, arcade.color.FRENCH_LIME, 20)
-        arcade.draw_text(f"Aceasta tura te feresti: {self.dodge_chance_bool} ", 19, 569, arcade.color.BLACK, 20)
+
+
+        if self.foot_damage == True:
+            u_dodge = ""
+
+
+            foot = "Dodge chance eliminated"
+            arcade.draw_text(foot, 20, 570, arcade.color.BLACK, 20)
+        else:
+            foot = ""
+            u_dodge = f"Aceasta tura te feresti: {self.dodge_chance_bool}"
+
+            arcade.draw_text(u_dodge, 20, 570, arcade.color.FRENCH_LIME, 20)
+            arcade.draw_text(u_dodge, 19, 569, arcade.color.BLACK, 20)
+
+
 
         if self.triple_damage_chance == True:
             arcade.draw_text(f"Boosted Damage: {self.triple_damage_chance} ", 20, 540, arcade.color.CELADON_BLUE,
@@ -285,6 +303,9 @@ class MyGame(arcade.Window):
                              20)
             arcade.draw_text(f"Boosted Damage: {self.double_damage_chance} ", 19, 539, arcade.color.BLACK,
                          20)
+
+
+
         # Afisez numarul random
         arcade.draw_text(self.text, 20, 500, arcade.color.CAPUT_MORTUUM, 30)
         arcade.draw_text(self.text, 19, 499, arcade.color.BLACK, 30)
@@ -295,6 +316,12 @@ class MyGame(arcade.Window):
         arcade.draw_lrbt_rectangle_filled(930, 990, 530, 590, arcade.color.LIGHT_RED_OCHRE)
         arcade.draw_lrbt_rectangle_outline(930, 990, 530, 590, arcade.color.BLACK, 3)
         arcade.draw_text("BACK", 935, 554, arcade.color.BLACK, 17)
+
+
+        # BODY DAMAGE INDICATIONS
+
+
+
 
 
     def draw_MAIN_GAME(self):
@@ -413,8 +440,8 @@ class MyGame(arcade.Window):
 
         self.head_damaged_list = arcade.SpriteList()
         self.head_damaged_sprite = arcade.Sprite("sprites/head_damaged_no_bg.png", SPRITE_SCALING-0.75)
-        self.head_damaged_sprite.center_y = 465
-        self.head_damaged_sprite.center_x = 40
+        self.head_damaged_sprite.center_y = 462
+        self.head_damaged_sprite.center_x = 41
         self.head_damaged_list.append(self.head_damaged_sprite)
 
         self.body_damaged_list = arcade.SpriteList()
@@ -426,8 +453,16 @@ class MyGame(arcade.Window):
         self.foot_damaged_list = arcade.SpriteList()
         self.foot_damaged_sprite = arcade.Sprite("sprites/leg_damaged_no_bg (1).png", SPRITE_SCALING - 0.75)
         self.foot_damaged_sprite.center_y = 410
-        self.foot_damaged_sprite.center_x = 45
+        self.foot_damaged_sprite.center_x = 47
         self.foot_damaged_list.append(self.foot_damaged_sprite)
+
+        self.right_foot_damaged_sprite = arcade.Sprite("sprites/leg_damaged_no_bg  flipped.png", SPRITE_SCALING - 0.75)
+        self.right_foot_damaged_sprite.center_y = 410
+        self.right_foot_damaged_sprite.center_x = 32
+        self.foot_damaged_list.append(self.right_foot_damaged_sprite)
+
+
+
 
 
 
@@ -531,6 +566,7 @@ class MyGame(arcade.Window):
 
             if self.foot_damage == True:
                 self.foot_damaged_list.draw()
+
             else:
                 self.foot_damaged_sprite = arcade.SpriteList()
 
@@ -680,9 +716,9 @@ class MyGame(arcade.Window):
 
             self.zombie_did_shoot = True
 
-            self.foot_damaged_sprite = arcade.SpriteList()
-            self.body_damaged_sprite = arcade.SpriteList()
-            self.head_damaged_sprite = arcade.SpriteList()
+            self.foot_damage = False
+            self.body_damage = False
+            self.head_damage = False
 
             self.text = None
 
@@ -718,13 +754,35 @@ class MyGame(arcade.Window):
                 arcade.play_sound(DICE)
 
                 #Dice going
-                self.random_number = random.randint(1, 6)
-                #dodge calculating
 
-                self.dodge_chance = random.randint(1, 10)
-                if self.dodge_chance == 1:
-                    self.dodge_chance_bool = True
-                    arcade.play_sound(EVADE)
+                #head damage debuff
+                if self.head_damage == True:
+                    self.random_number = random.randint(1,3)
+                else:
+                    self.random_number = random.randint(1, 6)
+
+
+
+                # Foot damage debuff
+                if self.foot_damage == True:
+                    self.dodge_chance = False
+
+                else:
+                    # dodge calculating
+                    self.dodge_chance = random.randint(1, 5)
+                    if self.dodge_chance == 1:
+                        self.dodge_chance_bool = True
+                        arcade.play_sound(EVADE)
+
+
+                #body damage debuff
+                if self.body_damage == True:
+                    self.player_base_attack = 5
+
+                    self.bullet_speed = 2
+                else:
+                    self.player_base_attack = 10
+                    self.bullet_speed = 6
 
                 self.text = f"Numar random: {self.random_number}"
                 if self.random_number % 2 == 0:
@@ -785,8 +843,8 @@ class MyGame(arcade.Window):
                 bullet.center_y = self.player_sprite.center_y - 25
 
                 # FIXED: Set bullet velocity using the current aiming angle
-                bullet.change_x = math.cos(self.current_angle) * BULLET_SPEED
-                bullet.change_y = math.sin(self.current_angle) * BULLET_SPEED
+                bullet.change_x = math.cos(self.current_angle) * self.bullet_speed
+                bullet.change_y = math.sin(self.current_angle) * self.bullet_speed
 
 
                 self.bullet_list.append(bullet)
@@ -876,6 +934,33 @@ class MyGame(arcade.Window):
 
                     self.health -= self.zombie_base_attack
 
+
+
+                    if zombie_bullet.center_y < 190 and zombie_bullet.center_y >= 155:
+                        print("foot")
+                        self.sprite_damage_chance = random.randint(1, 1)
+                        if self.sprite_damage_chance == 1:
+                            self.foot_damage = True
+                            print("feet damaged")
+                    elif zombie_bullet.center_y < 230 and zombie_bullet.center_y >= 190:
+                        print("body")
+                        self.sprite_damage_chance = random.randint(1, 3)
+                        if self.sprite_damage_chance == 1:
+                            self.body_damage = True
+                            print("body damaged")
+                    elif zombie_bullet.center_y < 290 and zombie_bullet.center_y >= 230:
+                        print("head")
+                        self.sprite_damage_chance = random.randint(1, 3)
+                        if self.sprite_damage_chance == 1:
+                            self.head_damage = True
+                            print("head damaged")
+
+
+
+
+
+
+
                     if self.zombie_base_attack >= 15:
                         arcade.play_sound(HIGH_DAMAGE_LOST)
                     else:
@@ -944,36 +1029,11 @@ class MyGame(arcade.Window):
             zombie_bullet = arcade.Sprite("ballBlue_07.png", BULLET_SCALING)
 
             zombie_bullet.center_x = self.zombie_sprite.center_x - 50
-            zombie_bullet.center_y = 190 + random.randint(10,100) - random.randint(10,60)
+            zombie_bullet.center_y = 190 + random.randint(10,100) - random.randint(10,55)
             zombie_bullet.change_x = -random.randint(2,8)
 
             # Damaged Zone calculation
-            if self.health_less_than_last_turn > self.health and self.dodge_chance_bool == False:
-                print("less health")
 
-
-            if self.health_less_than_last_turn > self.health:
-                self.zombie_did_not_missed = False
-                if zombie_bullet.center_y < 190 and zombie_bullet.center_y >= 161:
-                    print("foot")
-                    self.sprite_damage_chance = random.randint(1,1)
-                    if self.sprite_damage_chance == 1:
-                        self.foot_damage = True
-                        print("feet damaged")
-                elif zombie_bullet.center_y <230 and zombie_bullet.center_y >= 190:
-                    print("body")
-                    self.sprite_damage_chance = random.randint(1, 1)
-                    if self.sprite_damage_chance == 1:
-                        self.body_damage = True
-                        print("body damaged")
-                elif zombie_bullet.center_y <290 and zombie_bullet.center_y >= 230:
-                    print("head")
-                    self.sprite_damage_chance = random.randint(1, 1)
-                    if self.sprite_damage_chance == 1:
-                        self.head_damage = True
-                        print("head damaged")
-            else:
-                print("missed")
             self.zombie_bullet_list.append(zombie_bullet)
             self.zombie_done = True
             self.health_less_than_last_turn = self.health
