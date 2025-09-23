@@ -291,24 +291,34 @@ class MyGame(arcade.Window):
             arcade.draw_text(u_dodge, 20, 570, arcade.color.FRENCH_LIME, 20)
             arcade.draw_text(u_dodge, 19, 569, arcade.color.BLACK, 20)
 
+        if self.body_damage == True:
+            boost = ""
+            arcade.draw_text("Base damage reduced", 20, 540, arcade.color.BLACK, 20)
 
-
-        if self.triple_damage_chance == True:
-            arcade.draw_text(f"Boosted Damage: {self.triple_damage_chance} ", 20, 540, arcade.color.CELADON_BLUE,
-                             20)
-            arcade.draw_text(f"Boosted Damage: {self.triple_damage_chance} ", 19, 539, arcade.color.BLACK,
-                             20)
         else:
-            arcade.draw_text(f"Boosted Damage: {self.double_damage_chance} ", 20, 540, arcade.color.CELADON_BLUE,
-                             20)
-            arcade.draw_text(f"Boosted Damage: {self.double_damage_chance} ", 19, 539, arcade.color.BLACK,
-                         20)
+
+            if self.triple_damage_chance == True:
+                boost = f"Boosted Damage: {self.triple_damage_chance} "
+                arcade.draw_text(boost, 20, 540, arcade.color.CELADON_BLUE,20)
+                arcade.draw_text(boost, 19, 539, arcade.color.BLACK,20)
+            else:
+                boost = f"Boosted Damage: {self.double_damage_chance} "
+                arcade.draw_text(boost, 20, 540, arcade.color.CELADON_BLUE,  20)
+                arcade.draw_text(boost, 19, 539, arcade.color.BLACK,20)
+
+        if self.head_damage == True:
+            random_for_show = ""
+            arcade.draw_text(f"Your head is damaged, luck reduced : {self.random_number}", 20, 510,
+                             arcade.color.BLACK, 20)
+
+        else:
+            random_for_show = self.text
+
+            # Afisez numarul random
+            arcade.draw_text(random_for_show, 20, 500, arcade.color.CAPUT_MORTUUM, 30)
+            arcade.draw_text(random_for_show, 19, 499, arcade.color.BLACK, 30)
 
 
-
-        # Afisez numarul random
-        arcade.draw_text(self.text, 20, 500, arcade.color.CAPUT_MORTUUM, 30)
-        arcade.draw_text(self.text, 19, 499, arcade.color.BLACK, 30)
 
         #Afisez buton exit main-menu
 
@@ -329,7 +339,7 @@ class MyGame(arcade.Window):
         # Peisaj in caz de lovitura mare
 
         # Scena
-        if self.triple_damage_chance == True and self.zombie_base_attack >= 15:
+        if self.triple_damage_chance == True and self.zombie_base_attack >= 15 and self.body_damage == False:
             arcade.set_background_color(arcade.color.FLAX)
             arcade.draw_lrbt_rectangle_filled(500,1000,150,600, arcade.color.SLATE_GRAY)
             # Norisori
@@ -346,7 +356,7 @@ class MyGame(arcade.Window):
             arcade.draw_circle_filled(x2 - 70, y2, 35, arcade.color.YANKEES_BLUE)
             arcade.draw_circle_filled(x2, y2, 60, arcade.color.YANKEES_BLUE)
             arcade.draw_circle_filled(x2 + 70, y2, 35, arcade.color.YANKEES_BLUE)
-        elif self.triple_damage_chance == True:
+        elif self.triple_damage_chance == True and self.body_damage == False:
             arcade.set_background_color(arcade.color.FLAX)
 
             # Norisori
@@ -606,8 +616,8 @@ class MyGame(arcade.Window):
 
                 arcade.play_sound(WIN)
 
-                arcade.draw_text("Ai castigat! :)", 175, 305, arcade.color.BLACK, 110)
-                arcade.draw_text("Ai castigat! :)", 180, 300, arcade.color.BLUEBERRY, 110)
+                arcade.draw_text("Ai castigat! :)", 165, 305, arcade.color.BLACK, 110)
+                arcade.draw_text("Ai castigat! :)", 170, 300, arcade.color.BLUEBERRY, 110)
 
 
                 self.game_done = True
@@ -617,8 +627,8 @@ class MyGame(arcade.Window):
 
                 arcade.play_sound(FAIL)
 
-                arcade.draw_text("Ai pierdut! :(", 175, 305, arcade.color.BLACK, 110)
-                arcade.draw_text("Ai pierdut! :(", 180, 300, arcade.color.BLUEBERRY, 110)
+                arcade.draw_text("Ai pierdut! :(", 165, 305, arcade.color.BLACK, 110)
+                arcade.draw_text("Ai pierdut! :(", 170, 300, arcade.color.BLUEBERRY, 110)
 
                 self.game_done = True
                 self.menu_choice = 1
@@ -696,7 +706,7 @@ class MyGame(arcade.Window):
 
 
 
-        if x > 300 and x < 700 and y > 300 and y < 380:
+        if x > 300 and x < 700 and y > 300 and y < 380 and self.menu_choice == 1:
             arcade.play_sound(UI)
 
             # RESET GAME TO START
@@ -729,7 +739,7 @@ class MyGame(arcade.Window):
 
 
 
-        if x > 300 and x < 700 and y >200 and y< 280:
+        if x > 300 and x < 700 and y >200 and y< 280 and self.menu_choice == 1:
             arcade.play_sound(UI)
             self.menu_choice = 3
 
@@ -756,10 +766,7 @@ class MyGame(arcade.Window):
                 #Dice going
 
                 #head damage debuff
-                if self.head_damage == True:
-                    self.random_number = random.randint(1,3)
-                else:
-                    self.random_number = random.randint(1, 6)
+
 
 
 
@@ -773,6 +780,24 @@ class MyGame(arcade.Window):
                     if self.dodge_chance == 1:
                         self.dodge_chance_bool = True
                         arcade.play_sound(EVADE)
+
+                if self.head_damage == True:
+                    self.random_number = random.randint(1, 3)
+                    if self.random_number == 2:
+                        double_damage_change_again = random.randint(1,4)
+                        if double_damage_change_again == 1:
+                            self.random_number = 2
+                        else:
+                            self.random_number = 1
+
+                    if self.foot_damage == False:
+                        self.dodge_chance = random.randint(1,10)
+                        if self.dodge_chance == 1:
+                            self.dodge_chance_bool = True
+                            arcade.play_sound(EVADE)
+
+                else:
+                    self.random_number = random.randint(1, 6)
 
 
                 #body damage debuff
@@ -805,7 +830,7 @@ class MyGame(arcade.Window):
 
                 # MEDKIT SPAWN CHANCE
 
-                medkit_spawn_change = random.randint(1, 10)
+                medkit_spawn_change = random.randint(1, 6)
 
                 if medkit_spawn_change == 1:
                     self.spawn_medkit = True
@@ -938,7 +963,7 @@ class MyGame(arcade.Window):
 
                     if zombie_bullet.center_y < 190 and zombie_bullet.center_y >= 155:
                         print("foot")
-                        self.sprite_damage_chance = random.randint(1, 1)
+                        self.sprite_damage_chance = random.randint(1, 3)
                         if self.sprite_damage_chance == 1:
                             self.foot_damage = True
                             print("feet damaged")
