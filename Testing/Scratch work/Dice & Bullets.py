@@ -221,6 +221,15 @@ class MyGame(arcade.Window):
         self.foot_damaged_list = None
         self.foot_damaged_sprite = None
 
+
+        # INVENTORY
+        self.invetory_open = False
+
+        self.inventory_medkits = 1
+
+
+
+
         #Aiming Arrow
 
         self.mouse_x = 400
@@ -542,31 +551,59 @@ class MyGame(arcade.Window):
             self.draw_HUD()
 
     #==============================================
+        # INTERFATA INVENTAR
+
+            if self.invetory_open == True:
+                arcade.draw_lrbt_rectangle_filled(300,700,230,450,arcade.color.PASTEL_BROWN)
+                arcade.draw_lrbt_rectangle_outline(300, 700, 230, 450, arcade.color.BLACK,3)
+
+                # BUTON BACK
+                arcade.draw_lrbt_rectangle_filled(620, 680, 370, 430, arcade.color.LIGHT_RED_OCHRE)
+                arcade.draw_lrbt_rectangle_outline(620, 680, 370, 430, arcade.color.BLACK, 3)
+                arcade.draw_text("BACK", 625, 394, arcade.color.BLACK, 17)
+
+                arcade.draw_lrbt_rectangle_filled(320,445,350,430,arcade.color.RED_BROWN)
+                arcade.draw_lrbt_rectangle_outline(320, 445, 350, 430, arcade.color.BLACK,3)
+                arcade.draw_text(f"MEDKIT: {self.inventory_medkits}", 330, 380,arcade.color.BLACK,20)
+
+                arcade.draw_lrbt_rectangle_filled(320, 445, 250, 330, arcade.color.LIGHT_BLUE)
+                arcade.draw_lrbt_rectangle_outline(320, 445, 250, 330, arcade.color.BLACK, 3)
 
 
 
 
             #butoanele-------------
-            if self.turn == "dice" and self.zombie_did_shoot == True:
-                #time.sleep(0.9)
+
+            if self.turn == "dice" and self.zombie_did_shoot == True and self.invetory_open == False:
+
 
                 arcade.draw_lrbt_rectangle_filled(self.left+self.right, self.right+self.right, self.top, self.bottom, arcade.color.WHITE)
                 arcade.draw_lrbt_rectangle_outline(self.left+self.right, self.right+self.right, self.top, self.bottom, arcade.color.BLACK, 3)
                 arcade.draw_text("Dă cu zarul", 320, 70, arcade.color.BLACK, 27)
 
 
-            if self.turn == "player":
+            if self.turn == "player" and self.invetory_open == False:
                 arcade.draw_lrbt_rectangle_filled(self.left, self.right, self.top, self.bottom, arcade.color.PEAR)
                 arcade.draw_lrbt_rectangle_outline(self.left, self.right, self.top, self.bottom, arcade.color.BLACK, 3)
                 arcade.draw_text(f"Ataca!", 100, 70, arcade.color.BLACK, 30)
 
-            else:
-                ...
+
 
 
 
             arcade.draw_lrbt_rectangle_filled(self.left+self.right+self.right, self.right*3, self.top, self.bottom, arcade.color.LIGHT_BLUE)
             arcade.draw_text("Zombi, atac", 565, 70, arcade.color.BLACK, 27)
+
+
+            # BUTON INVENTAR:
+            arcade.draw_lrbt_rectangle_filled(800,870,self.top,self.bottom, arcade.color.YELLOW_GREEN)
+            arcade.draw_text("INV", 815,self.top+40,arcade.color.BLACK,22)
+            arcade.draw_lrbt_rectangle_outline(800, 870, self.top, self.bottom, arcade.color.BLACK,3)
+
+            # AFISAZ SCOR
+            arcade.draw_lrbt_rectangle_filled(920, 990, self.top, self.bottom, arcade.color.CADMIUM_YELLOW)
+            arcade.draw_text("SCOR", 927, self.top + 70, arcade.color.BLACK, 20)
+            arcade.draw_lrbt_rectangle_outline(920, 990, self.top, self.bottom, arcade.color.BLACK, 3)
 
 
 
@@ -699,6 +736,9 @@ class MyGame(arcade.Window):
         if x> 930 and y > 530 and x < 990 and y < 590:
             self.set_mouse_visible(True)
 
+        if x >300 and x < 700 and y > 200 and y < 450 and self.invetory_open == True:
+            self.set_mouse_visible(True)
+
         # Daca nu vrem ca sa se vada cursorul mousului
 
 
@@ -751,14 +791,24 @@ class MyGame(arcade.Window):
 
 
 
+        if x> 800 and x < 870 and y > self.top and y < self.bottom:
+            print("ok")
+            self.invetory_open = True
+            arcade.play_sound(UI)
+
+
+
+        if x > 620 and x < 680 and y > 370 and y < 430 and self.menu_choice == 2:
+            self.invetory_open = False
+            arcade.play_sound(UI)
 
 
 
 #******************** Buton DICE **************
 
-        if self.turn == "dice" and self.zombie_did_shoot == True:
+        if self.turn == "dice" and self.zombie_did_shoot == True and self.invetory_open == False:
 
-            if 300 < x < self.right * 2 and y > self.top and y < self.bottom or arcade.key.SPACE == True:
+            if 300 < x < self.right * 2 and y > self.top and y < self.bottom:
 
 
                 arcade.play_sound(DICE)
@@ -858,7 +908,7 @@ class MyGame(arcade.Window):
         #Buronul din stanga de atac ------
 
         if self.turn == "player":
-            if self.left < x < self.right and y > self.top and y < self.bottom:
+            if self.left < x < self.right and y > self.top and y < self.bottom and self.invetory_open == False:
 
                 bullet = arcade.Sprite("ballBlack_04.png", BULLET_SCALING)
                 arcade.play_sound(THROW)
