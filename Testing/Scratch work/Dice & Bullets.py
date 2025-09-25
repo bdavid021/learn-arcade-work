@@ -234,7 +234,13 @@ class MyGame(arcade.Window):
         self.medkit_shop_cost = 10
         self.coins = 15
 
+        #COINS
 
+        self.super_coin_list = None
+        self.super_coin_sprite = None
+
+        self.coin_list = None
+        self.coin_sprite = None
 
 
 
@@ -524,7 +530,22 @@ class MyGame(arcade.Window):
 
         self.medkit_list.append(self.medkit_sprite)
 
-        self.spawn_medkit = False
+
+
+
+        #COINS SETUP
+
+        self.super_coin_list = arcade.SpriteList()
+        self.super_coin_sprite = arcade.Sprite("sprites/coin_15.png", SPRITE_SCALING)
+
+        self.super_coin_sprite.center_x = random.randint(150,990)
+        self.super_coin_sprite.center_y = random.randint(290, 580)
+
+        self.super_coin_list.append(self.super_coin_sprite)
+
+        self.super_coin_spawn = False
+
+        #MUZICA DE FUNDAL
 
         if self.menu_choice == 1 :
             player = arcade.play_sound(ELEVATOR_MUSIC, volume= 0.15, loop=True)
@@ -677,6 +698,8 @@ class MyGame(arcade.Window):
             #Desenez medkit
 
             self.medkit_list.draw()
+
+            self.super_coin_list.draw()
 
 
 
@@ -931,7 +954,7 @@ class MyGame(arcade.Window):
                 medkit_spawn_change = random.randint(1, 8)
 
                 if medkit_spawn_change == 1:
-                    self.spawn_medkit = True
+
                     medkit = arcade.Sprite("health-red 32px.png", SPRITE_SCALING)
 
                     medkit.center_x = random.randint(150, 800)
@@ -941,6 +964,22 @@ class MyGame(arcade.Window):
 
                 self.zombie_did_shoot = False
                 self.zombie_base_attack = random.randint(10, 20)
+
+
+                #COINS SPAWN CHANCE
+
+
+                super_coin_spawn_chance = random.randint(1,1)
+
+                if super_coin_spawn_chance == 1:
+                    self.super_coin_spawn = True
+
+                    super_coin = arcade.Sprite("sprites/coin_15.png", SPRITE_SCALING -10 )
+
+
+                    super_coin.center_x = random.randint(150, 990)
+                    super_coin.center_y = random.randint(290, 580)
+
 
 
 
@@ -1144,6 +1183,18 @@ class MyGame(arcade.Window):
                 self.health += 20
                 self.bullet.remove_from_sprite_lists()
                 medkitlist.remove_from_sprite_lists()
+
+        #COINS HITBOX
+
+        for super_coin in self.super_coin_list:
+
+            hit_list = arcade.check_for_collision_with_list(super_coin,self.super_coin_list)
+
+            if len(hit_list) > 0:
+
+                self.coins += 30
+                self.bullet.remove_from_sprite_lists()
+                super_coin.remove_from_sprite_lists()
 
 
 
