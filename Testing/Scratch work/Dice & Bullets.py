@@ -227,6 +227,14 @@ class MyGame(arcade.Window):
 
         self.inventory_medkits = 1
 
+        # SHOP
+
+        self.shop_is_open = False
+
+        self.medkit_shop_cost = 10
+        self.coins = 15
+
+
 
 
 
@@ -276,7 +284,7 @@ class MyGame(arcade.Window):
         if self.triple_damage_chance == True and self.double_damage_chance == False:
             arcade.draw_text(f"{self.player_base_attack * 3} DMG", 129, 389, arcade.color.BLACK, 25)
             arcade.draw_text(f"{self.player_base_attack * 3} DMG", 130, 390, arcade.color.DARK_RED, 25)
-        elif self.double_damage_chance == True:
+        elif self.double_damage_chance:
             arcade.draw_text(f"{self.player_base_attack * 2} DMG", 129, 389, arcade.color.BLACK, 25)
             arcade.draw_text(f"{self.player_base_attack * 2} DMG", 130, 390, arcade.color.DARK_RED, 25)
         else:
@@ -564,17 +572,39 @@ class MyGame(arcade.Window):
 
                 arcade.draw_lrbt_rectangle_filled(320,445,350,430,arcade.color.RED_BROWN)
                 arcade.draw_lrbt_rectangle_outline(320, 445, 350, 430, arcade.color.BLACK,3)
-                arcade.draw_text(f"MEDKIT: {self.inventory_medkits}", 330, 380,arcade.color.BLACK,20)
+                arcade.draw_text(f"MEDKIT: {self.inventory_medkits}", 326, 380,arcade.color.BLACK,20)
 
                 arcade.draw_lrbt_rectangle_filled(320, 445, 250, 330, arcade.color.LIGHT_BLUE)
                 arcade.draw_lrbt_rectangle_outline(320, 445, 250, 330, arcade.color.BLACK, 3)
 
+        #Interfata SHOP ------------
 
+            if self.shop_is_open == True:
+                arcade.draw_lrbt_rectangle_filled(250, 750, 180, 450, arcade.color.LAVENDER_INDIGO)
+                arcade.draw_lrbt_rectangle_outline(250, 750, 180, 450, arcade.color.BLACK, 3)
+
+                # BUTON BACK
+                arcade.draw_lrbt_rectangle_filled(670, 730, 370, 430, arcade.color.LIGHT_RED_OCHRE)
+                arcade.draw_lrbt_rectangle_outline(670, 730, 370, 430, arcade.color.BLACK, 3)
+                arcade.draw_text("BACK", 675, 394, arcade.color.BLACK, 17)
+
+
+
+                arcade.draw_lrbt_rectangle_filled(270, 445, 300, 380, arcade.color.RED_BROWN)
+                arcade.draw_lrbt_rectangle_outline(270, 445, 300, 380, arcade.color.BLACK, 3)
+                arcade.draw_text(f"MEDKIT- 15C", 286, 330, arcade.color.BLACK, 20)
+
+                arcade.draw_text(f"{self.coins} COINS", 270, 420, arcade.color.BLACK, 20)
+
+                #------
+
+                arcade.draw_lrbt_rectangle_filled(270, 445, 200, 280, arcade.color.LIGHT_BLUE)
+                arcade.draw_lrbt_rectangle_outline(270, 445, 200, 280, arcade.color.BLACK, 3)
 
 
             #butoanele-------------
 
-            if self.turn == "dice" and self.zombie_did_shoot == True and self.invetory_open == False:
+            if self.turn == "dice" and self.zombie_did_shoot == True and self.invetory_open == False and self.shop_is_open == False:
 
 
                 arcade.draw_lrbt_rectangle_filled(self.left+self.right, self.right+self.right, self.top, self.bottom, arcade.color.WHITE)
@@ -582,7 +612,7 @@ class MyGame(arcade.Window):
                 arcade.draw_text("Dă cu zarul", 320, 70, arcade.color.BLACK, 27)
 
 
-            if self.turn == "player" and self.invetory_open == False:
+            if self.turn == "player" and self.invetory_open == False and self.shop_is_open == False:
                 arcade.draw_lrbt_rectangle_filled(self.left, self.right, self.top, self.bottom, arcade.color.PEAR)
                 arcade.draw_lrbt_rectangle_outline(self.left, self.right, self.top, self.bottom, arcade.color.BLACK, 3)
                 arcade.draw_text(f"Ataca!", 100, 70, arcade.color.BLACK, 30)
@@ -592,7 +622,9 @@ class MyGame(arcade.Window):
 
 
             arcade.draw_lrbt_rectangle_filled(self.left+self.right+self.right, self.right*3, self.top, self.bottom, arcade.color.LIGHT_BLUE)
-            arcade.draw_text("Zombi, atac", 565, 70, arcade.color.BLACK, 27)
+            arcade.draw_lrbt_rectangle_outline(self.left + self.right + self.right, self.right * 3, self.top,
+                                              self.bottom, arcade.color.BLACK,3)
+            arcade.draw_text("SHOP", 615, 70, arcade.color.BLACK, 27)
 
 
             # BUTON INVENTAR:
@@ -739,6 +771,9 @@ class MyGame(arcade.Window):
         if x >300 and x < 700 and y > 200 and y < 450 and self.invetory_open == True:
             self.set_mouse_visible(True)
 
+        if x > 250 and x < 750 and y > 180 and y < 450 and self.shop_is_open == True:
+            self.set_mouse_visible(True)
+
         # Daca nu vrem ca sa se vada cursorul mousului
 
 
@@ -770,6 +805,9 @@ class MyGame(arcade.Window):
             self.body_damage = False
             self.head_damage = False
 
+            self.coins = 15
+            self.inventory_medkits = 1
+
             self.text = None
 
 
@@ -795,6 +833,16 @@ class MyGame(arcade.Window):
             print("ok")
             self.invetory_open = True
             arcade.play_sound(UI)
+
+
+        if x > 320 and x < 445 and y >350 and y < 430 and self.invetory_open == True and self.inventory_medkits > 0:
+            self.inventory_medkits -= 1
+            print(f"Medkits remaining {self.inventory_medkits}")
+            self.health += 10
+            self.foot_damage = False
+            self.body_damage = False
+            self.head_damage = False
+            arcade.play_sound(HEAL)
 
 
 
@@ -880,7 +928,7 @@ class MyGame(arcade.Window):
 
                 # MEDKIT SPAWN CHANCE
 
-                medkit_spawn_change = random.randint(1, 6)
+                medkit_spawn_change = random.randint(1, 8)
 
                 if medkit_spawn_change == 1:
                     self.spawn_medkit = True
@@ -933,10 +981,28 @@ class MyGame(arcade.Window):
 
 
 
-        #Butonul din dreapta de zombi (pt test)
+        # SHOP
+
 
         if x > 550 and x < 750 and y > self.top and y < self.bottom:
-            print("Esti slaaaab")
+            self.shop_is_open = True
+
+
+            print("Shop is open")
+
+        if x > 670 and x < 730 and y > 370 and y < 430 and self.shop_is_open == True:
+            self.shop_is_open = False
+
+
+        if x > 270 and x < 445 and y > 300 and y < 380 and self.shop_is_open == True  and self.coins > 0:
+            self.inventory_medkits += 1
+            self.coins -= 15
+
+
+
+
+
+
 
 
 
@@ -1075,7 +1141,7 @@ class MyGame(arcade.Window):
 
 
                 arcade.play_sound(HEAL)
-                self.health = self.health + 20
+                self.health += 20
                 self.bullet.remove_from_sprite_lists()
                 medkitlist.remove_from_sprite_lists()
 
@@ -1104,7 +1170,7 @@ class MyGame(arcade.Window):
             zombie_bullet = arcade.Sprite("ballBlue_07.png", BULLET_SCALING)
 
             zombie_bullet.center_x = self.zombie_sprite.center_x - 50
-            zombie_bullet.center_y = 190 + random.randint(10,100) - random.randint(10,55)
+            zombie_bullet.center_y = 190 + random.randint(10,100) - random.randint(10,50)
             zombie_bullet.change_x = -random.randint(2,8)
 
             # Damaged Zone calculation
