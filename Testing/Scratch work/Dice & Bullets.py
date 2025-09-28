@@ -223,16 +223,20 @@ class MyGame(arcade.Window):
 
 
         # INVENTORY
-        self.invetory_open = False
+        self.inventory_open = False
 
         self.inventory_medkits = 1
+        self.inventory_walls = 1
 
         # SHOP
 
         self.shop_is_open = False
 
-        self.medkit_shop_cost = 10
-        self.coins = 15
+        self.medkit_shop_cost = 15
+        self.coins = 30
+
+        self.wall_shop_cost = 20
+
 
         #COINS
 
@@ -241,6 +245,12 @@ class MyGame(arcade.Window):
 
         self.coin_list = None
         self.coin_sprite = None
+
+        # WALL POWERUP
+
+        self.wall_power_up_list = None
+        self.wall_power_up_sprite = None
+        self.wall_placed = False
 
 
 
@@ -536,14 +546,19 @@ class MyGame(arcade.Window):
         #COINS SETUP
 
         self.super_coin_list = arcade.SpriteList()
-        self.super_coin_sprite = arcade.Sprite("sprites/coin_15.png", SPRITE_SCALING)
+        self.super_coin_sprite = arcade.Sprite("sprites/coin_15.png", 0.3)
 
         self.super_coin_sprite.center_x = random.randint(150,990)
         self.super_coin_sprite.center_y = random.randint(290, 580)
 
-        self.super_coin_list.append(self.super_coin_sprite)
+        #WALL SETUP
 
-        self.super_coin_spawn = False
+        self.wall_power_up_list = arcade.SpriteList()
+        self.wall_power_up_sprite = arcade.Sprite("sprites/elementStone052.png", SPRITE_SCALING)
+
+
+
+
 
         #MUZICA DE FUNDAL
 
@@ -582,7 +597,7 @@ class MyGame(arcade.Window):
     #==============================================
         # INTERFATA INVENTAR
 
-            if self.invetory_open == True:
+            if self.inventory_open == True:
                 arcade.draw_lrbt_rectangle_filled(300,700,230,450,arcade.color.PASTEL_BROWN)
                 arcade.draw_lrbt_rectangle_outline(300, 700, 230, 450, arcade.color.BLACK,3)
 
@@ -597,11 +612,12 @@ class MyGame(arcade.Window):
 
                 arcade.draw_lrbt_rectangle_filled(320, 445, 250, 330, arcade.color.LIGHT_BLUE)
                 arcade.draw_lrbt_rectangle_outline(320, 445, 250, 330, arcade.color.BLACK, 3)
+                arcade.draw_text(f"WALLS: {self.inventory_walls}", 326,280, arcade.color.BLACK, 20)
 
         #Interfata SHOP ------------
 
             if self.shop_is_open == True:
-                arcade.draw_lrbt_rectangle_filled(250, 750, 180, 450, arcade.color.LAVENDER_INDIGO)
+                arcade.draw_lrbt_rectangle_filled(250, 750, 180, 450, arcade.color.BURLYWOOD)
                 arcade.draw_lrbt_rectangle_outline(250, 750, 180, 450, arcade.color.BLACK, 3)
 
                 # BUTON BACK
@@ -615,17 +631,19 @@ class MyGame(arcade.Window):
                 arcade.draw_lrbt_rectangle_outline(270, 445, 300, 380, arcade.color.BLACK, 3)
                 arcade.draw_text(f"MEDKIT- 15C", 286, 330, arcade.color.BLACK, 20)
 
-                arcade.draw_text(f"{self.coins} COINS", 270, 420, arcade.color.BLACK, 20)
+                arcade.draw_text(f"{self.coins} COINS", 268, 403, arcade.color.BLACK, 20)
+                arcade.draw_text(f"{self.coins} COINS", 270, 405, arcade.color.YELLOW, 20)
 
                 #------
 
                 arcade.draw_lrbt_rectangle_filled(270, 445, 200, 280, arcade.color.LIGHT_BLUE)
                 arcade.draw_lrbt_rectangle_outline(270, 445, 200, 280, arcade.color.BLACK, 3)
+                arcade.draw_text("WALL- 30C", 286, 230, arcade.color.BLACK, 20)
 
 
             #butoanele-------------
 
-            if self.turn == "dice" and self.zombie_did_shoot == True and self.invetory_open == False and self.shop_is_open == False:
+            if self.turn == "dice" and self.zombie_did_shoot == True and self.inventory_open == False and self.shop_is_open == False:
 
 
                 arcade.draw_lrbt_rectangle_filled(self.left+self.right, self.right+self.right, self.top, self.bottom, arcade.color.WHITE)
@@ -633,7 +651,7 @@ class MyGame(arcade.Window):
                 arcade.draw_text("Dă cu zarul", 320, 70, arcade.color.BLACK, 27)
 
 
-            if self.turn == "player" and self.invetory_open == False and self.shop_is_open == False:
+            if self.turn == "player" and self.inventory_open == False and self.shop_is_open == False:
                 arcade.draw_lrbt_rectangle_filled(self.left, self.right, self.top, self.bottom, arcade.color.PEAR)
                 arcade.draw_lrbt_rectangle_outline(self.left, self.right, self.top, self.bottom, arcade.color.BLACK, 3)
                 arcade.draw_text(f"Ataca!", 100, 70, arcade.color.BLACK, 30)
@@ -700,6 +718,9 @@ class MyGame(arcade.Window):
             self.medkit_list.draw()
 
             self.super_coin_list.draw()
+
+            if self.wall_placed == True:
+                self.wall_power_up_list.draw()
 
 
 
@@ -791,7 +812,7 @@ class MyGame(arcade.Window):
         if x> 930 and y > 530 and x < 990 and y < 590:
             self.set_mouse_visible(True)
 
-        if x >300 and x < 700 and y > 200 and y < 450 and self.invetory_open == True:
+        if x >300 and x < 700 and y > 200 and y < 450 and self.inventory_open == True:
             self.set_mouse_visible(True)
 
         if x > 250 and x < 750 and y > 180 and y < 450 and self.shop_is_open == True:
@@ -828,10 +849,15 @@ class MyGame(arcade.Window):
             self.body_damage = False
             self.head_damage = False
 
-            self.coins = 15
-            self.inventory_medkits = 1
+            self.coins = 30
+            self.inventory_medkits = 0
+            self.inventory_walls = 0
 
             self.text = None
+            self.wall_placed = False
+            self.wall_power_up_list.clear()
+
+
 
 
         if x> 930 and x < 990 and y > 530 and y < 590 and self.menu_choice == 1:
@@ -854,11 +880,11 @@ class MyGame(arcade.Window):
 
         if x> 800 and x < 870 and y > self.top and y < self.bottom:
             print("ok")
-            self.invetory_open = True
+            self.inventory_open = True
             arcade.play_sound(UI)
 
 
-        if x > 320 and x < 445 and y >350 and y < 430 and self.invetory_open == True and self.inventory_medkits > 0:
+        if x > 320 and x < 445 and y >350 and y < 430 and self.inventory_open == True and self.inventory_medkits > 0:
             self.inventory_medkits -= 1
             print(f"Medkits remaining {self.inventory_medkits}")
             self.health += 10
@@ -867,17 +893,28 @@ class MyGame(arcade.Window):
             self.head_damage = False
             arcade.play_sound(HEAL)
 
+        if x > 320 and x < 445 and y > 250 and y < 330 and self.inventory_open == True and self.inventory_walls > 0:
+            self.inventory_walls -= 1
+            self.wall_placed = True
+
+            wall = arcade.Sprite("sprites/elementStone052.png", 0.4)
+
+            wall.center_y = 205
+            wall.center_x = 240
+
+            self.wall_power_up_list.append(wall)
+
 
 
         if x > 620 and x < 680 and y > 370 and y < 430 and self.menu_choice == 2:
-            self.invetory_open = False
+            self.inventory_open = False
             arcade.play_sound(UI)
 
 
 
 #******************** Buton DICE **************
 
-        if self.turn == "dice" and self.zombie_did_shoot == True and self.invetory_open == False:
+        if self.turn == "dice" and self.zombie_did_shoot == True and self.inventory_open == False and self.menu_choice == 2:
 
             if 300 < x < self.right * 2 and y > self.top and y < self.bottom:
 
@@ -969,16 +1006,18 @@ class MyGame(arcade.Window):
                 #COINS SPAWN CHANCE
 
 
-                super_coin_spawn_chance = random.randint(1,1)
+                super_coin_spawn_chance = random.randint(1,10)
 
                 if super_coin_spawn_chance == 1:
                     self.super_coin_spawn = True
 
-                    super_coin = arcade.Sprite("sprites/coin_15.png", SPRITE_SCALING -10 )
+                    super_coin = arcade.Sprite("sprites/coin_15.png", 0.3 )
 
 
                     super_coin.center_x = random.randint(150, 990)
                     super_coin.center_y = random.randint(290, 580)
+
+                    self.super_coin_list.append(super_coin)
 
 
 
@@ -995,7 +1034,7 @@ class MyGame(arcade.Window):
         #Buronul din stanga de atac ------
 
         if self.turn == "player":
-            if self.left < x < self.right and y > self.top and y < self.bottom and self.invetory_open == False:
+            if self.left < x < self.right and y > self.top and y < self.bottom and self.inventory_open == False and self.menu_choice == 2:
 
                 bullet = arcade.Sprite("ballBlack_04.png", BULLET_SCALING)
                 arcade.play_sound(THROW)
@@ -1033,9 +1072,13 @@ class MyGame(arcade.Window):
             self.shop_is_open = False
 
 
-        if x > 270 and x < 445 and y > 300 and y < 380 and self.shop_is_open == True  and self.coins > 0:
+        if x > 270 and x < 445 and y > 300 and y < 380 and self.shop_is_open == True  and self.coins >= 0:
             self.inventory_medkits += 1
             self.coins -= 15
+
+        if x > 270 and x < 445 and y > 200 and y < 280 and self.shop_is_open == True and (self.coins - self.wall_shop_cost) >= 0:
+            self.inventory_walls += 1
+            self.coins -= 30
 
 
 
@@ -1151,7 +1194,18 @@ class MyGame(arcade.Window):
 
 
             player_hit_list = arcade.check_for_collision_with_list(zombie_bullet, self.bullet_list)
+            wall_hit_list = arcade.check_for_collision_with_list(zombie_bullet, self.wall_power_up_list)
 
+
+            if len(wall_hit_list) > 0 and self.wall_placed == True:
+                self.zombie_did_shoot = True
+                arcade.play_sound(UI)
+
+                self.zombie_did_not_missed = True
+
+                zombie_bullet.remove_from_sprite_lists()
+                self.wall_power_up_sprite.remove_from_sprite_lists()
+                self.wall_placed = False
 
             if len(player_hit_list) > 0:
                 self.zombie_did_shoot = True
@@ -1161,6 +1215,9 @@ class MyGame(arcade.Window):
 
                 zombie_bullet.remove_from_sprite_lists()
                 self.bullet.remove_from_sprite_lists()
+
+
+
 
 
 
@@ -1188,7 +1245,7 @@ class MyGame(arcade.Window):
 
         for super_coin in self.super_coin_list:
 
-            hit_list = arcade.check_for_collision_with_list(super_coin,self.super_coin_list)
+            hit_list = arcade.check_for_collision_with_list(super_coin,self.bullet_list)
 
             if len(hit_list) > 0:
 
@@ -1230,6 +1287,8 @@ class MyGame(arcade.Window):
             self.zombie_done = True
             self.health_less_than_last_turn = self.health
             print(self.health_less_than_last_turn)
+
+
 
 
 
