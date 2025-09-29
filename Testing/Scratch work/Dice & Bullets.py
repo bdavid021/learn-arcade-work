@@ -1,6 +1,6 @@
 import arcade
 import random
-import time
+
 import math
 
 
@@ -136,8 +136,8 @@ class MyGame(arcade.Window):
         self.menu_choice = 1
 
 
-        self.game_done = False
-
+        self.game_done_lost = False
+        self.game_done_win = False
 
 
         #Some coordonates for buttons
@@ -156,6 +156,7 @@ class MyGame(arcade.Window):
         self.zombie_done = False
 
         self.score = 0
+        self.shoots = 0
 
         #Sprites -------
 
@@ -235,10 +236,10 @@ class MyGame(arcade.Window):
 
         self.shop_is_open = False
 
-        self.medkit_shop_cost = 15
+        self.medkit_shop_cost = 25
         self.coins = 30
 
-        self.wall_shop_cost = 20
+        self.wall_shop_cost = 15
 
 
         #COINS
@@ -588,7 +589,8 @@ class MyGame(arcade.Window):
             #MAIN MENU
 
             draw_main_menu()
-            self.game_done = False
+            self.game_done_lost = False
+            self.game_done_win = True
 
             self.dice_list.draw()
 
@@ -637,7 +639,7 @@ class MyGame(arcade.Window):
 
                 arcade.draw_lrbt_rectangle_filled(270, 445, 300, 380, arcade.color.RED_BROWN)
                 arcade.draw_lrbt_rectangle_outline(270, 445, 300, 380, arcade.color.BLACK, 3)
-                arcade.draw_text(f"MEDKIT- 15C", 286, 330, arcade.color.BLACK, 20)
+                arcade.draw_text(f"MEDKIT- {self.medkit_shop_cost}C", 286, 330, arcade.color.BLACK, 20)
 
                 arcade.draw_text(f"{self.coins} COINS", 268, 403, arcade.color.BLACK, 20)
                 arcade.draw_text(f"{self.coins} COINS", 270, 405, arcade.color.YELLOW, 20)
@@ -646,7 +648,7 @@ class MyGame(arcade.Window):
 
                 arcade.draw_lrbt_rectangle_filled(270, 445, 200, 280, arcade.color.LIGHT_BLUE)
                 arcade.draw_lrbt_rectangle_outline(270, 445, 200, 280, arcade.color.BLACK, 3)
-                arcade.draw_text("WALL- 30C", 286, 230, arcade.color.BLACK, 20)
+                arcade.draw_text(f"WALL- {self.wall_shop_cost}C", 286, 230, arcade.color.BLACK, 20)
 
 
             #butoanele-------------
@@ -682,7 +684,7 @@ class MyGame(arcade.Window):
             # AFISAZ SCOR
             arcade.draw_lrbt_rectangle_filled(920, 990, self.top, self.bottom, arcade.color.CADMIUM_YELLOW)
             arcade.draw_text("SCOR", 927, self.top + 70, arcade.color.BLACK, 20)
-            arcade.draw_text(self.score, 940,self.top+20, arcade.color.BLACK, 20)
+            arcade.draw_text(self.score, 945,self.top+20, arcade.color.BLACK, 20)
             arcade.draw_lrbt_rectangle_outline(920, 990, self.top, self.bottom, arcade.color.BLACK, 3)
 
 
@@ -741,17 +743,21 @@ class MyGame(arcade.Window):
 
                 arcade.play_sound(WIN)
 
-                arcade.draw_lrbt_rectangle_filled(200, 800, 150,450, arcade.color.LIGHT_GRAY)
-                arcade.draw_text(f"Scor: {self.score}", 210, 300, arcade.color.BLACK,30)
+                arcade.draw_lrbt_rectangle_filled(200, 800, 250, 500, arcade.color.LIGHT_GRAY)
+                arcade.draw_lrbt_rectangle_outline(200, 800, 250, 500, arcade.color.BLACK, 4)
+                arcade.draw_text(f"Gloante trase: {self.shoots}", 300, 300, arcade.color.BLACK, 30)
 
+                arcade.draw_lrbt_rectangle_filled(600, 750, 280, 340, arcade.color.LIGHT_BROWN)
+                arcade.draw_lrbt_rectangle_outline(600, 750, 280, 340, arcade.color.BLACK, 3)
+                arcade.draw_text("NEXT", 630, 300, arcade.color.BLACK, 30)
 
-                arcade.draw_text("Ai castigat! :)", 165, 305, arcade.color.BLACK, 110)
-                arcade.draw_text("Ai castigat! :)", 170, 300, arcade.color.BLUEBERRY, 110)
+                arcade.draw_text("Ai căștigat! :)", 250, 420, arcade.color.BLACK, 70)
+                arcade.draw_text("Ai căștigat! :)", 253, 423, arcade.color.BLUEBERRY, 70)
 
+                self.zombie_bullet_list.clear()
+                self.game_done_lost = False
+                self.game_done_win = True
 
-
-                self.game_done = True
-                self.menu_choice = 1
 
             if self.health <= 0:
 
@@ -770,10 +776,12 @@ class MyGame(arcade.Window):
                 arcade.draw_text("Ai pierdut! :(", 250, 420, arcade.color.BLACK, 70)
                 arcade.draw_text("Ai pierdut! :(", 253, 423, arcade.color.BLUEBERRY, 70)
 
-                self.game_done = True
+                self.game_done_lost = True
+                self.game_done_win = False
 
 
             # Arrow
+
             if self.is_locked and self.locked_angle is not None:
                 # Use locked angle
                 angle_to_use = self.locked_angle
@@ -844,7 +852,10 @@ class MyGame(arcade.Window):
         if x > 250 and x < 750 and y > 180 and y < 450 and self.shop_is_open == True:
             self.set_mouse_visible(True)
 
-        if self.game_done == True:
+        if self.game_done_lost == True:
+            self.set_mouse_visible(True)
+
+        if self.game_done_win == True:
             self.set_mouse_visible(True)
 
         # Daca nu vrem ca sa se vada cursorul mousului
@@ -859,12 +870,15 @@ class MyGame(arcade.Window):
 
             # RESET GAME TO START
 
+            self.game_done_lost = False
+            self.game_done_win = False
+
             self.menu_choice = 2
             self.turn = "dice"
             self.dice_done = False
             self.player_done = False
             self.zombie_done = False
-            self.health = 1
+            self.health = 100
             self.zombie_health = 150
             self.triple_damage_chance = False
             self.zombie_base_attack = 10
@@ -884,7 +898,11 @@ class MyGame(arcade.Window):
 
             self.text = None
             self.wall_placed = False
+
             self.wall_power_up_list.clear()
+            self.coin_list.clear()
+            self.super_coin_list.clear()
+
 
 
 
@@ -950,6 +968,7 @@ class MyGame(arcade.Window):
 
                 arcade.play_sound(DICE)
 
+                self.shoots += 1
                 #Dice going
 
                 #head damage debuff
@@ -1016,7 +1035,7 @@ class MyGame(arcade.Window):
 
                 # MEDKIT SPAWN CHANCE
 
-                medkit_spawn_change = random.randint(1, 8)
+                medkit_spawn_change = random.randint(1, 10)
 
                 if medkit_spawn_change == 1:
 
@@ -1034,7 +1053,7 @@ class MyGame(arcade.Window):
                 #COINS SPAWN CHANCE
 
 
-                super_coin_spawn_chance = random.randint(1,8)
+                super_coin_spawn_chance = random.randint(1,15)
 
                 if super_coin_spawn_chance == 1:
                     self.super_coin_spawn = True
@@ -1047,7 +1066,7 @@ class MyGame(arcade.Window):
 
                     self.super_coin_list.append(super_coin)
 
-                coin_spawn_chance = random.randint(1,4)
+                coin_spawn_chance = random.randint(1,10)
 
                 if coin_spawn_chance == 1:
                     self.coin_spawn_chance = True
@@ -1095,16 +1114,45 @@ class MyGame(arcade.Window):
             self.shop_is_open = False
 
 
-        if x > 270 and x < 445 and y > 300 and y < 380 and self.shop_is_open == True  and self.coins >= 0:
+        if x > 270 and x < 445 and y > 300 and y < 380 and self.shop_is_open == True  and (self.coins-self.medkit_shop_cost) >= 0:
             self.inventory_medkits += 1
-            self.coins -= 15
+            self.coins -= self.medkit_shop_cost
 
         if x > 270 and x < 445 and y > 200 and y < 280 and self.shop_is_open == True and (self.coins - self.wall_shop_cost) >= 0:
             self.inventory_walls += 1
-            self.coins -= 30
+            self.coins -= self.wall_shop_cost
 
-        if x > 600 and x < 750 and y > 280 and y < 340 and self.game_done == True:
+        if x > 600 and x < 750 and y > 280 and y < 340 and self.game_done_lost == True:
             self.menu_choice = 1
+
+        if x > 600 and x < 750 and y > 280 and y < 340 and self.game_done_win == True and self.game_done_lost == False:
+
+            self.score += 1
+            self.game_done_lost = False
+            self.game_done_win = False
+
+            self.menu_choice = 2
+            self.turn = "dice"
+            self.dice_done = False
+            self.player_done = False
+            self.zombie_done = False
+            self.health = 100
+            self.zombie_health = 150 + (5* self.score)
+            self.triple_damage_chance = False
+            self.zombie_base_attack = 10
+
+            self.zombie_bullet_list.clear()
+            self.bullet_list.clear()
+
+            self.zombie_did_shoot = True
+
+            self.coins += 30
+
+            self.coin_list.clear()
+            self.super_coin_list.clear()
+            self.medkit_list.clear()
+
+
 
     def on_update(self, delta_time):
 
