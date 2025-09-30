@@ -216,6 +216,8 @@ class MyGame(arcade.Window):
 
         #DAMAGED BODY PARTS SPRITE
 
+        self.toughness = 3
+
         self.head_damaged_list = None
         self.head_damaged_sprite = None
 
@@ -240,6 +242,11 @@ class MyGame(arcade.Window):
         self.coins = 30
 
         self.wall_shop_cost = 15
+
+        self.max_hp = 0
+        self.max_hp_cost = 50
+
+        self.toughness_cost = 80
 
 
         #COINS
@@ -651,6 +658,19 @@ class MyGame(arcade.Window):
                 arcade.draw_text(f"WALL- {self.wall_shop_cost}C", 286, 230, arcade.color.BLACK, 20)
 
 
+                #----- THOUGHNESS
+
+                arcade.draw_lrbt_rectangle_filled(470, 645, 200, 280, arcade.color.ROBIN_EGG_BLUE)
+                arcade.draw_lrbt_rectangle_outline(470, 645, 200, 280, arcade.color.BLACK, 3)
+                arcade.draw_text(f"STRENGTH-{self.toughness_cost}C", 480, 230, arcade.color.BLACK, 20)
+
+                #---- MAX HP
+
+                arcade.draw_lrbt_rectangle_filled(470, 645, 300, 380, arcade.color.SPANISH_CRIMSON)
+                arcade.draw_lrbt_rectangle_outline(470, 645, 300, 380, arcade.color.BLACK, 3)
+                arcade.draw_text(f"MAX HP- {self.max_hp_cost}C", 480, 330, arcade.color.BLACK, 20)
+
+
             #butoanele-------------
 
             if self.turn == "dice" and self.zombie_did_shoot == True and self.inventory_open == False and self.shop_is_open == False:
@@ -885,6 +905,7 @@ class MyGame(arcade.Window):
             self.medkit_list.clear()
             self.zombie_bullet_list.clear()
             self.bullet_list.clear()
+            self.max_hp = 0
 
             self.zombie_did_shoot = True
 
@@ -892,9 +913,11 @@ class MyGame(arcade.Window):
             self.body_damage = False
             self.head_damage = False
 
-            self.coins = 30
+            self.coins = 300
             self.inventory_medkits = 0
             self.inventory_walls = 0
+
+            self.toughness = 3
 
             self.text = None
             self.wall_placed = False
@@ -1066,7 +1089,7 @@ class MyGame(arcade.Window):
 
                     self.super_coin_list.append(super_coin)
 
-                coin_spawn_chance = random.randint(1,10)
+                coin_spawn_chance = random.randint(1,8)
 
                 if coin_spawn_chance == 1:
                     self.coin_spawn_chance = True
@@ -1122,6 +1145,17 @@ class MyGame(arcade.Window):
             self.inventory_walls += 1
             self.coins -= self.wall_shop_cost
 
+        if x > 470 and x < 645 and y > 300 and y < 380 and self.shop_is_open == True and (self.coins - self.max_hp_cost) >= 0:
+            self.max_hp += 15
+            self.coins -= self.max_hp_cost
+            self.upgraded_text = True
+
+        if x > 470 and x < 645 and y > 200 and y < 280 and self.shop_is_open == True and (self.coins - self.toughness_cost) >= 0:
+            self.toughness += 1
+            self.coins -= self.toughness_cost
+            print("ok")
+
+
         if x > 600 and x < 750 and y > 280 and y < 340 and self.game_done_lost == True:
             self.menu_choice = 1
 
@@ -1136,10 +1170,11 @@ class MyGame(arcade.Window):
             self.dice_done = False
             self.player_done = False
             self.zombie_done = False
-            self.health = 100
+            self.health = 100 + self.max_hp
             self.zombie_health = 150 + (5* self.score)
             self.triple_damage_chance = False
             self.zombie_base_attack = 10
+
 
             self.zombie_bullet_list.clear()
             self.bullet_list.clear()
@@ -1224,19 +1259,19 @@ class MyGame(arcade.Window):
 
                     if zombie_bullet.center_y < 190 and zombie_bullet.center_y >= 155:
                         print("foot")
-                        self.sprite_damage_chance = random.randint(1, 3)
+                        self.sprite_damage_chance = random.randint(1, self.toughness)
                         if self.sprite_damage_chance == 1:
                             self.foot_damage = True
                             print("feet damaged")
                     elif zombie_bullet.center_y < 230 and zombie_bullet.center_y >= 190:
                         print("body")
-                        self.sprite_damage_chance = random.randint(1, 3)
+                        self.sprite_damage_chance = random.randint(1, self.toughness)
                         if self.sprite_damage_chance == 1:
                             self.body_damage = True
                             print("body damaged")
                     elif zombie_bullet.center_y < 290 and zombie_bullet.center_y >= 230:
                         print("head")
-                        self.sprite_damage_chance = random.randint(1, 3)
+                        self.sprite_damage_chance = random.randint(1, self.toughness)
                         if self.sprite_damage_chance == 1:
                             self.head_damage = True
                             print("head damaged")
