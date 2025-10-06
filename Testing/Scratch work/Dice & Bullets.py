@@ -1,7 +1,18 @@
 import arcade
 import random
-
 import math
+import sys
+import os
+
+
+
+def resource_path(relative_path):
+
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 
 
 SCREEN_WIDTH = 1000
@@ -11,62 +22,75 @@ BULLET_SCALING = 0.15
 BULLET_SPEED =6
 
 #sounds
-DICE = arcade.load_sound("sounds/dice-142528.mp3")
-THROW = arcade.load_sound("sounds/retro-game-shot-152052.mp3")
-FAIL = arcade.load_sound("sounds/dead-8bit-41400.mp3")
-WIN = arcade.load_sound("sounds/you-win-sequence-3-183950.mp3")
-ZOMBIE_HURT = arcade.load_sound("sounds/retro-hurt-2-236675.mp3")
-ELEVATOR_MUSIC = arcade.load_sound("sounds/jazz-lounge-elevator-music-332339.mp3")
-HIGH_DAMAGE_LOST = arcade.load_sound("sounds/explosion-8-bit-11-314691.mp3")
-DAMAGE_LOST = arcade.load_sound("sounds/hurt_c_08-102842.mp3")
-HEAL = arcade.load_sound("sounds/classic-game-action-positive-10-224398.mp3")
-UI = arcade.load_sound("sounds/confirm-tap-394001.mp3")
-BULLETS_COLLIDING = arcade.load_sound("sounds/funny-boing-flexatone-wobble-352710.mp3")
-EVADE = arcade.load_sound("sounds/classic-game-action-positive-1-224407.mp3")
+DICE = arcade.load_sound(resource_path("sounds/dice-142528.mp3"))
+THROW = arcade.load_sound(resource_path("sounds/retro-game-shot-152052.mp3"))
+FAIL = arcade.load_sound(resource_path("sounds/dead-8bit-41400.mp3"))
+WIN = arcade.load_sound(resource_path("sounds/you-win-sequence-3-183950.mp3"))
+ZOMBIE_HURT = arcade.load_sound(resource_path("sounds/retro-hurt-2-236675.mp3"))
+ELEVATOR_MUSIC = arcade.load_sound(resource_path("sounds/jazz-lounge-elevator-music-332339.mp3"))
+HIGH_DAMAGE_LOST = arcade.load_sound(resource_path("sounds/explosion-8-bit-11-314691.mp3"))
+DAMAGE_LOST = arcade.load_sound(resource_path("sounds/hurt_c_08-102842.mp3"))
+HEAL = arcade.load_sound(resource_path("sounds/classic-game-action-positive-10-224398.mp3"))
+UI = arcade.load_sound(resource_path("sounds/confirm-tap-394001.mp3"))
+BULLETS_COLLIDING = arcade.load_sound(resource_path("sounds/funny-boing-flexatone-wobble-352710.mp3"))
+EVADE = arcade.load_sound(resource_path("sounds/classic-game-action-positive-1-224407.mp3"))
+PURCHASE = arcade.load_sound(resource_path("sounds/purchase-success-384963.mp3"))
+COIN_COLLECT = arcade.load_sound(resource_path("sounds/retro-coin-1-236677.mp3"))
+WALL_HIT = arcade.load_sound(resource_path("sounds/crash-6711.mp3"))
+WALL_PLACED = arcade.load_sound(resource_path("sounds/thick-book-placed-on-a-classroom-desk-330037.mp3"))
+NOT_ENOUGH_MONEY = arcade.load_sound(resource_path("sounds/classic-game-action-negative-9-224413.mp3"))
+
 
 #DRAWING THINGS
 
 def draw_tutorial_objects():
-    # TUTORIAL MENIU =========================
-
-    # BUTON BACK
+    # BACK BUTTON
     arcade.draw_lrbt_rectangle_filled(930, 990, 530, 590, arcade.color.LIGHT_RED_OCHRE)
     arcade.draw_lrbt_rectangle_outline(930, 990, 530, 590, arcade.color.BLACK, 3)
     arcade.draw_text("BACK", 935, 554, arcade.color.BLACK, 17)
 
-    # EXPLICATII
-    arcade.draw_text("Bine ai venit la Dice & Bullet!", 220, 550, arcade.color.BLACK, 25)
+    # INSTRUCTIONS
+    arcade.draw_text("Welcome to Dice & Bullet!", 280, 560, arcade.color.BLACK, 25)
 
-    arcade.draw_text("GENERAL GAME KNOWLEDGE: ", 20, 460, arcade.color.BLACK, 20)
+    arcade.draw_text("GAME OVERVIEW:", 20, 530, arcade.color.BANGLADESH_GREEN, 20)
 
-    arcade.draw_text("1. Scopul acestui joc este sa invingi zombi-ul (HP = 0), fara ca tu sa mori.", 20, 420,
-                     arcade.color.BLACK, 17)
+    arcade.draw_text("Your goal is to defeat the zombie. Each victory earns you 1 point. Try to get as many!", 20, 505,
+                     arcade.color.BANGLADESH_GREEN, 17)
     arcade.draw_text(
-        "2. Trebuie sa dai cu zarul apasand pe buton, daca ai nimerit un numar par, atunci in aceea tura vei da 2x DMG.",
-        20, 390, arcade.color.BLACK, 17)
-    arcade.draw_text("3. Si zombie-ul da cu zarul, asa ca fii atent cat de puternic te ataca!", 20, 360,
-                     arcade.color.BLACK, 17)
-    arcade.draw_text(
-        "4. Misca, mouse-ul pentru a tinti, unde vrei sa tragi pe tasta \"F\" blochezi tinta, iar pe \"R\" deblochezi.",
-        20, 330, arcade.color.BLACK, 17)
-    arcade.draw_text("5. Dupa ce ai blocat tinta ATACA zombi-ul, sau bullet-ul acestuia pentru a bloca atacului lui!",
-                     20, 300, arcade.color.BLACK, 17)
-    arcade.draw_text("6. Ai o sansa de 10% de a evita complet atacul zombi-ului!", 20, 270, arcade.color.BLACK, 17)
+        "Each turn starts with a dice roll that determines your damage output and dodge chance.",
+        20, 480, arcade.color.BANGLADESH_GREEN, 17)
+    arcade.draw_text("The zombie also rolls dice, so watch out for how hard it attacks!", 20, 450,
+                     arcade.color.BANGLADESH_GREEN, 17)
 
-    arcade.draw_text("ITEMS: ", 20, 230, arcade.color.BLACK, 20)
+    arcade.draw_text("CONTROLS:", 20, 420, arcade.color.BOYSENBERRY, 20)
 
-    arcade.draw_text("- Medkit: Ai o sansa de 10% ca sa se spawneze un Medkit pe harta. Acesta regenereaza 20 HP.", 20,
-                     190, arcade.color.BLACK, 17)
+    arcade.draw_text("Move your mouse to aim. Press 'F' to lock your target, 'R' to unlock.", 20, 390,
+                     arcade.color.BOYSENBERRY, 17)
+    arcade.draw_text("Once locked, shoot at the zombie OR its bullet to block incoming attacks!", 20, 360,
+                     arcade.color.BOYSENBERRY, 17)
+    arcade.draw_text("You have a 20% base chance to dodge the zombie's attacks completely!", 20, 330,
+                     arcade.color.BOYSENBERRY, 17)
 
-    arcade.draw_text("TIPS: ", 20, 150, arcade.color.BLACK, 17)
+    arcade.draw_text("BODY DAMAGE SYSTEM:", 20, 290, arcade.color.COBALT, 20)
 
-    arcade.draw_text("1. Gandeste-te ce se merita mai mult! Sa ataci zombi-ul, bazandu-te ca poate eviti atacul?", 20,
-                     120, arcade.color.BLACK, 17)
-    arcade.draw_text(
-        "   sau poate esti low, si se merita sa ataci bullet-ul zombi-ului pentru a fi sigur? sau de ce nu sa iei", 20,
-        90, arcade.color.BLACK, 17)
-    arcade.draw_text("   acel medkit... dar oare se merita? zarul iti va purta noroc?", 20, 60, arcade.color.BLACK, 17)
-    arcade.draw_text("TU DECIZI ASTA! Mult noroc!", 300, 20, arcade.color.BLACK, 24)
+    arcade.draw_text("Getting hit can damage specific body parts (33% chance), causing lasting debuffs:", 20, 260,
+                     arcade.color.COBALT, 17)
+    arcade.draw_text("- HEAD: Reduces dice luck (lower rolls more likely)", 20, 230,
+                     arcade.color.COBALT, 17)
+    arcade.draw_text("- BODY: Reduces base damage from 10 to 5 and slows bullets", 20, 200,
+                     arcade.color.COBALT, 17)
+    arcade.draw_text("- LEGS: Eliminates dodge chance completely", 20, 170,
+                     arcade.color.COBALT, 17)
+
+    arcade.draw_text("ITEMS & SHOP:", 20, 140, arcade.color.DARK_SCARLET, 20)
+    arcade.draw_text("Medkits (10% spawn): Heal 20 HP and cure all body damage. Can also be bought. / Wall: Blocks one shot", 20, 110,
+                     arcade.color.DARK_SCARLET, 17)
+    arcade.draw_text("Coins: Collect to buy upgrades. Gold coins = 30c, Copper coins = 15c", 20, 80,
+                     arcade.color.DARK_SCARLET, 17)
+    arcade.draw_text("Max HP: Permanently increases starting health. Toughness: Reduces body damage chance.", 20, 50,
+                     arcade.color.DARK_SCARLET, 17)
+
+    arcade.draw_text("Remember, think about your moves. GOOD LUCK! My highest score is 7. Can you get a higher one?", 50,20,arcade.color.BLACK, 17)
 
 def draw_main_menu():
     # BUTON START
@@ -100,9 +124,6 @@ def draw_main_menu():
     arcade.draw_circle_filled(x + 50, y + 60, 50, arcade.color.CASTLETON_GREEN,3)
     arcade.draw_circle_filled(x, y, 65, arcade.color.BOTTLE_GREEN, 3, )
 
-    arcade.draw_circle_outline(x - 80, y, 35, arcade.color.BLACK)
-    arcade.draw_circle_outline(x + 50, y + 60, 50, arcade.color.BLACK)
-    arcade.draw_circle_outline(x, y, 65, arcade.color.BLACK)
 
 
 
@@ -110,10 +131,6 @@ def draw_main_menu():
     y2 = 500
 
 
-
-    arcade.draw_circle_outline(x2 - 80, y2- 90, 35, arcade.color.BLACK)
-    arcade.draw_circle_outline(x2 + 20, y2 + 50, 50, arcade.color.BLACK)
-    arcade.draw_circle_outline(x2- 60, y2- 10, 65, arcade.color.BLACK)
 
     arcade.draw_circle_filled(x2 - 80, y2 - 90, 35, arcade.color.BRITISH_RACING_GREEN)
     arcade.draw_circle_filled(x2 + 20, y2 + 50, 50, arcade.color.CASTLETON_GREEN)
@@ -129,6 +146,10 @@ class MyGame(arcade.Window):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, "Dice & Bullets!")
         arcade.set_background_color(arcade.color.LIGHT_BLUE)
 
+
+        # Tutorial
+
+        self.next_tutorial = False
 
 
         #STARTING MENU
@@ -248,6 +269,9 @@ class MyGame(arcade.Window):
 
         self.toughness_cost = 80
 
+        #music bug
+
+        self.played = False
 
         #COINS
 
@@ -256,6 +280,8 @@ class MyGame(arcade.Window):
 
         self.coin_list = None
         self.coin_sprite = None
+
+        self.spawned_coins = 0
 
         # WALL POWERUP
 
@@ -281,7 +307,7 @@ class MyGame(arcade.Window):
         # Moving DICE
 
         self.dice_list = arcade.SpriteList()
-        self.dice_sprite = arcade.Sprite("dice_question.png", SPRITE_SCALING+2)
+        self.dice_sprite = arcade.Sprite(resource_path("sprites/dice_question.png"), SPRITE_SCALING+2)
 
         self.dice_sprite.position_y = 100
         self.dice_sprite.position_x = 100
@@ -330,7 +356,7 @@ class MyGame(arcade.Window):
             arcade.draw_text(foot, 20, 570, arcade.color.BLACK, 20)
         else:
             foot = ""
-            u_dodge = f"Aceasta tura te feresti: {self.dodge_chance_bool}"
+            u_dodge = f"This turn you dodge: {self.dodge_chance_bool}"
 
             arcade.draw_text(u_dodge, 20, 570, arcade.color.FRENCH_LIME, 20)
             arcade.draw_text(u_dodge, 19, 569, arcade.color.BLACK, 20)
@@ -486,7 +512,7 @@ class MyGame(arcade.Window):
 
         self.player_list = arcade.SpriteList()
 
-        self.player_sprite = arcade.Sprite("character_maleAdventurer_side.png", SPRITE_SCALING)
+        self.player_sprite = arcade.Sprite(resource_path("sprites/character_maleAdventurer_side.png"), SPRITE_SCALING)
 
         self.player_sprite.center_x  = 162
         self.player_sprite.center_y  = 255
@@ -494,24 +520,24 @@ class MyGame(arcade.Window):
 
 
         self.head_damaged_list = arcade.SpriteList()
-        self.head_damaged_sprite = arcade.Sprite("sprites/head_damaged_no_bg.png", SPRITE_SCALING-0.75)
+        self.head_damaged_sprite = arcade.Sprite(resource_path("sprites/head_damaged_no_bg.png"), SPRITE_SCALING-0.75)
         self.head_damaged_sprite.center_y = 462
         self.head_damaged_sprite.center_x = 41
         self.head_damaged_list.append(self.head_damaged_sprite)
 
         self.body_damaged_list = arcade.SpriteList()
-        self.body_damaged_sprite = arcade.Sprite("sprites/body_damaged_no_bg.png", SPRITE_SCALING-0.75)
+        self.body_damaged_sprite = arcade.Sprite(resource_path("sprites/body_damaged_no_bg.png"), SPRITE_SCALING-0.75)
         self.body_damaged_sprite.center_y = 432
         self.body_damaged_sprite.center_x = 40
         self.body_damaged_list.append(self.body_damaged_sprite)
 
         self.foot_damaged_list = arcade.SpriteList()
-        self.foot_damaged_sprite = arcade.Sprite("sprites/leg_damaged_no_bg (1).png", SPRITE_SCALING - 0.75)
+        self.foot_damaged_sprite = arcade.Sprite(resource_path("sprites/leg_damaged_no_bg (1).png"), SPRITE_SCALING - 0.75)
         self.foot_damaged_sprite.center_y = 410
         self.foot_damaged_sprite.center_x = 47
         self.foot_damaged_list.append(self.foot_damaged_sprite)
 
-        self.right_foot_damaged_sprite = arcade.Sprite("sprites/leg_damaged_no_bg  flipped.png", SPRITE_SCALING - 0.75)
+        self.right_foot_damaged_sprite = arcade.Sprite(resource_path("sprites/leg_damaged_no_bg  flipped.png"), SPRITE_SCALING - 0.75)
         self.right_foot_damaged_sprite.center_y = 410
         self.right_foot_damaged_sprite.center_x = 32
         self.foot_damaged_list.append(self.right_foot_damaged_sprite)
@@ -525,7 +551,7 @@ class MyGame(arcade.Window):
 
         self.zombie_list = arcade.SpriteList()
 
-        self.zombie_sprite = arcade.Sprite("character_zombie_attack0.png", SPRITE_SCALING)
+        self.zombie_sprite = arcade.Sprite(resource_path("sprites/character_zombie_attack0.png"), SPRITE_SCALING)
 
         self.zombie_sprite.center_x = 820
         self.zombie_sprite.center_y = 255
@@ -545,7 +571,7 @@ class MyGame(arcade.Window):
 
         self.medkit_list = arcade.SpriteList()
 
-        self.medkit_sprite = arcade.Sprite("health-red 32px.png", SPRITE_SCALING)
+        self.medkit_sprite = arcade.Sprite(resource_path("sprites/health-red 32px.png"), SPRITE_SCALING)
 
         self.medkit_sprite.center_x = random.randint(150, 990)
         self.medkit_sprite.center_y = random.randint(250, 580)
@@ -558,19 +584,19 @@ class MyGame(arcade.Window):
         #COINS SETUP
 
         self.super_coin_list = arcade.SpriteList()
-        self.super_coin_sprite = arcade.Sprite("sprites/coin_15.png", 0.3)
+        self.super_coin_sprite = arcade.Sprite(resource_path("sprites/coin_11.png"), 0.3)
 
         self.super_coin_sprite.center_x = random.randint(150,990)
         self.super_coin_sprite.center_y = random.randint(290, 580)
 
         self.coin_list = arcade.SpriteList()
-        self.coin_sprite = arcade.Sprite("sprites/coin_11.png", 0.3)
+        self.coin_sprite = arcade.Sprite(resource_path("sprites/coin_19.png"), 0.3)
 
 
         #WALL SETUP
 
         self.wall_power_up_list = arcade.SpriteList()
-        self.wall_power_up_sprite = arcade.Sprite("sprites/elementStone052.png", SPRITE_SCALING)
+        self.wall_power_up_sprite = arcade.Sprite(resource_path("sprites/elementStone052.png"), SPRITE_SCALING)
 
 
 
@@ -662,7 +688,7 @@ class MyGame(arcade.Window):
 
                 arcade.draw_lrbt_rectangle_filled(470, 645, 200, 280, arcade.color.ROBIN_EGG_BLUE)
                 arcade.draw_lrbt_rectangle_outline(470, 645, 200, 280, arcade.color.BLACK, 3)
-                arcade.draw_text(f"STRENGTH-{self.toughness_cost}C", 480, 230, arcade.color.BLACK, 20)
+                arcade.draw_text(f"TOUGHNESS-{self.toughness_cost}C", 476, 230, arcade.color.BLACK, 18)
 
                 #---- MAX HP
 
@@ -678,13 +704,13 @@ class MyGame(arcade.Window):
 
                 arcade.draw_lrbt_rectangle_filled(self.left+self.right, self.right+self.right, self.top, self.bottom, arcade.color.WHITE)
                 arcade.draw_lrbt_rectangle_outline(self.left+self.right, self.right+self.right, self.top, self.bottom, arcade.color.BLACK, 3)
-                arcade.draw_text("Dă cu zarul", 320, 70, arcade.color.BLACK, 27)
+                arcade.draw_text("Roll a dice!", 320, 70, arcade.color.BLACK, 27)
 
 
             if self.turn == "player" and self.inventory_open == False and self.shop_is_open == False:
                 arcade.draw_lrbt_rectangle_filled(self.left, self.right, self.top, self.bottom, arcade.color.PEAR)
                 arcade.draw_lrbt_rectangle_outline(self.left, self.right, self.top, self.bottom, arcade.color.BLACK, 3)
-                arcade.draw_text(f"Ataca!", 100, 70, arcade.color.BLACK, 30)
+                arcade.draw_text(f"Attack!", 100, 70, arcade.color.BLACK, 30)
 
 
 
@@ -703,7 +729,7 @@ class MyGame(arcade.Window):
 
             # AFISAZ SCOR
             arcade.draw_lrbt_rectangle_filled(920, 990, self.top, self.bottom, arcade.color.CADMIUM_YELLOW)
-            arcade.draw_text("SCOR", 927, self.top + 70, arcade.color.BLACK, 20)
+            arcade.draw_text("SCORE", 925, self.top + 70, arcade.color.BLACK, 17)
             arcade.draw_text(self.score, 945,self.top+20, arcade.color.BLACK, 20)
             arcade.draw_lrbt_rectangle_outline(920, 990, self.top, self.bottom, arcade.color.BLACK, 3)
 
@@ -761,18 +787,20 @@ class MyGame(arcade.Window):
             # End game
             if self.zombie_health <= 0:
 
-                arcade.play_sound(WIN)
+                while self.played == False:
+                    arcade.play_sound(WIN)
+                    self.played = True
 
                 arcade.draw_lrbt_rectangle_filled(200, 800, 250, 500, arcade.color.LIGHT_GRAY)
                 arcade.draw_lrbt_rectangle_outline(200, 800, 250, 500, arcade.color.BLACK, 4)
-                arcade.draw_text(f"Gloante trase: {self.shoots}", 300, 300, arcade.color.BLACK, 30)
+                arcade.draw_text(f"BULLETS SHOT: {self.shoots}", 300, 300, arcade.color.BLACK, 30)
 
                 arcade.draw_lrbt_rectangle_filled(600, 750, 280, 340, arcade.color.LIGHT_BROWN)
                 arcade.draw_lrbt_rectangle_outline(600, 750, 280, 340, arcade.color.BLACK, 3)
                 arcade.draw_text("NEXT", 630, 300, arcade.color.BLACK, 30)
 
-                arcade.draw_text("Ai căștigat! :)", 250, 420, arcade.color.BLACK, 70)
-                arcade.draw_text("Ai căștigat! :)", 253, 423, arcade.color.BLUEBERRY, 70)
+                arcade.draw_text("You won! :)", 250, 420, arcade.color.BLACK, 70)
+                arcade.draw_text("You won! :)", 253, 423, arcade.color.BLUEBERRY, 70)
 
                 self.zombie_bullet_list.clear()
                 self.game_done_lost = False
@@ -781,20 +809,23 @@ class MyGame(arcade.Window):
 
             if self.health <= 0:
 
-                arcade.play_sound(FAIL)
+                while self.played == False:
+                    arcade.play_sound(FAIL)
+                    self.played = True
+
 
 
 
                 arcade.draw_lrbt_rectangle_filled(200, 800, 250, 500, arcade.color.LIGHT_GRAY)
                 arcade.draw_lrbt_rectangle_outline(200, 800, 250, 500, arcade.color.BLACK, 4)
-                arcade.draw_text(f"Scor: {self.score}", 300, 300, arcade.color.BLACK, 30)
+                arcade.draw_text(f"Score: {self.score}", 300, 300, arcade.color.BLACK, 30)
 
                 arcade.draw_lrbt_rectangle_filled(600,750,280,340, arcade.color.LIGHT_BROWN)
                 arcade.draw_lrbt_rectangle_outline(600, 750, 280, 340, arcade.color.BLACK,3)
                 arcade.draw_text("EXIT", 630, 300, arcade.color.BLACK, 30)
 
-                arcade.draw_text("Ai pierdut! :(", 250, 420, arcade.color.BLACK, 70)
-                arcade.draw_text("Ai pierdut! :(", 253, 423, arcade.color.BLUEBERRY, 70)
+                arcade.draw_text("You lost! :(", 250, 420, arcade.color.BLACK, 70)
+                arcade.draw_text("You lost! :(", 253, 423, arcade.color.BLUEBERRY, 70)
 
                 self.game_done_lost = True
                 self.game_done_win = False
@@ -829,12 +860,10 @@ class MyGame(arcade.Window):
         elif self.menu_choice == 3:
 
             # TUTORIAL
-
-            draw_tutorial_objects()
-
-
-
-
+            if self.next_tutorial == False:
+                draw_tutorial_objects()
+            else:
+                draw_tutorial_objects()
 
 
     def on_key_press(self, symbol: int, modifiers: int):
@@ -906,6 +935,9 @@ class MyGame(arcade.Window):
             self.zombie_bullet_list.clear()
             self.bullet_list.clear()
             self.max_hp = 0
+            self.played = False
+
+            self.spawned_coins = 0
 
             self.zombie_did_shoot = True
 
@@ -913,7 +945,7 @@ class MyGame(arcade.Window):
             self.body_damage = False
             self.head_damage = False
 
-            self.coins = 300
+            self.coins = 40
             self.inventory_medkits = 0
             self.inventory_walls = 0
 
@@ -925,8 +957,6 @@ class MyGame(arcade.Window):
             self.wall_power_up_list.clear()
             self.coin_list.clear()
             self.super_coin_list.clear()
-
-
 
 
 
@@ -954,25 +984,33 @@ class MyGame(arcade.Window):
             arcade.play_sound(UI)
 
 
-        if x > 320 and x < 445 and y >350 and y < 430 and self.inventory_open == True and self.inventory_medkits > 0:
-            self.inventory_medkits -= 1
+        if x > 320 and x < 445 and y >350 and y < 430 and self.inventory_open == True :
+            if self.inventory_medkits > 0:
+                self.inventory_medkits -= 1
 
-            self.health += 10
-            self.foot_damage = False
-            self.body_damage = False
-            self.head_damage = False
-            arcade.play_sound(HEAL)
+                self.health += 10
+                self.foot_damage = False
+                self.body_damage = False
+                self.head_damage = False
+                self.bullet_speed = 6
+                arcade.play_sound(HEAL)
+            else:
+                arcade.play_sound(NOT_ENOUGH_MONEY)
 
-        if x > 320 and x < 445 and y > 250 and y < 330 and self.inventory_open == True and self.inventory_walls > 0:
-            self.inventory_walls -= 1
-            self.wall_placed = True
+        if x > 320 and x < 445 and y > 250 and y < 330 and self.inventory_open == True  and self.wall_placed == False:
+            if self.inventory_walls > 0:
+                self.inventory_walls -= 1
+                self.wall_placed = True
+                arcade.play_sound(WALL_PLACED)
 
-            wall = arcade.Sprite("sprites/elementStone052.png", 0.4)
+                wall = arcade.Sprite(resource_path("sprites/elementStone052.png"), 0.4)
 
-            wall.center_y = 205
-            wall.center_x = 240
+                wall.center_y = 205
+                wall.center_x = 240
 
-            self.wall_power_up_list.append(wall)
+                self.wall_power_up_list.append(wall)
+            else:
+                arcade.play_sound(NOT_ENOUGH_MONEY)
 
 
 
@@ -1037,7 +1075,7 @@ class MyGame(arcade.Window):
                     self.player_base_attack = 10
                     self.bullet_speed = 6
 
-                self.text = f"Numar random: {self.random_number}"
+                self.text = f"Random number: {self.random_number}"
                 if self.random_number % 2 == 0:
                     self.double_damage_chance = True
                     self.player_double_damage_attack = self.player_base_attack * 2
@@ -1062,7 +1100,7 @@ class MyGame(arcade.Window):
 
                 if medkit_spawn_change == 1:
 
-                    medkit = arcade.Sprite("health-red 32px.png", SPRITE_SCALING)
+                    medkit = arcade.Sprite(resource_path("sprites/health-red 32px.png"), SPRITE_SCALING)
 
                     medkit.center_x = random.randint(150, 800)
                     medkit.center_y = random.randint(250, 580)
@@ -1075,13 +1113,12 @@ class MyGame(arcade.Window):
 
                 #COINS SPAWN CHANCE
 
+                super_coin_spawn_chance = random.randint(1,12)
 
-                super_coin_spawn_chance = random.randint(1,15)
-
-                if super_coin_spawn_chance == 1:
+                if super_coin_spawn_chance == 1 and self.spawned_coins < 3:
                     self.super_coin_spawn = True
-
-                    super_coin = arcade.Sprite("sprites/coin_15.png", 0.3 )
+                    self.spawned_coins += 1
+                    super_coin = arcade.Sprite(resource_path("sprites/coin_11.png"), 0.25 )
 
 
                     super_coin.center_x = random.randint(150, 990)
@@ -1091,10 +1128,10 @@ class MyGame(arcade.Window):
 
                 coin_spawn_chance = random.randint(1,8)
 
-                if coin_spawn_chance == 1:
+                if coin_spawn_chance == 1 and self.spawned_coins < 3:
                     self.coin_spawn_chance = True
-
-                    coin = arcade.Sprite("sprites/coin_11.png", 0.3 )
+                    self.spawned_coins += 1
+                    coin = arcade.Sprite(resource_path("sprites/coin_19.png"), 0.25 )
 
                     coin.center_x = random.randint(150, 990)
                     coin.center_y = random.randint(290, 580)
@@ -1106,7 +1143,7 @@ class MyGame(arcade.Window):
         if self.turn == "player":
             if self.left < x < self.right and y > self.top and y < self.bottom and self.inventory_open == False and self.menu_choice == 2:
 
-                bullet = arcade.Sprite("ballBlack_04.png", BULLET_SCALING)
+                bullet = arcade.Sprite(resource_path("sprites/ballBlack_04.png"), BULLET_SCALING)
                 arcade.play_sound(THROW)
 
                 # Set bullet starting position
@@ -1129,32 +1166,47 @@ class MyGame(arcade.Window):
 
         if x > 550 and x < 750 and y > self.top and y < self.bottom:
             self.shop_is_open = True
+            arcade.play_sound(UI)
 
-
-            print("Shop is open")
 
         if x > 670 and x < 730 and y > 370 and y < 430 and self.shop_is_open == True:
             self.shop_is_open = False
+            arcade.play_sound(UI)
 
 
-        if x > 270 and x < 445 and y > 300 and y < 380 and self.shop_is_open == True  and (self.coins-self.medkit_shop_cost) >= 0:
-            self.inventory_medkits += 1
-            self.coins -= self.medkit_shop_cost
+        if x > 270 and x < 445 and y > 300 and y < 380 and self.shop_is_open == True :
+            if (self.coins-self.medkit_shop_cost) >= 0:
+                self.inventory_medkits += 1
+                self.coins -= self.medkit_shop_cost
+                arcade.play_sound(PURCHASE,0.5)
+            else:
+                arcade.play_sound(NOT_ENOUGH_MONEY)
 
-        if x > 270 and x < 445 and y > 200 and y < 280 and self.shop_is_open == True and (self.coins - self.wall_shop_cost) >= 0:
-            self.inventory_walls += 1
-            self.coins -= self.wall_shop_cost
+        if x > 270 and x < 445 and y > 200 and y < 280 and self.shop_is_open == True :
 
-        if x > 470 and x < 645 and y > 300 and y < 380 and self.shop_is_open == True and (self.coins - self.max_hp_cost) >= 0:
-            self.max_hp += 15
-            self.coins -= self.max_hp_cost
-            self.upgraded_text = True
+            if (self.coins - self.wall_shop_cost) >= 0:
+                self.inventory_walls += 1
+                self.coins -= self.wall_shop_cost
+                arcade.play_sound(PURCHASE,0.5)
+            if (self.coins - self.wall_shop_cost) <= 0:
+                arcade.play_sound(NOT_ENOUGH_MONEY)
 
-        if x > 470 and x < 645 and y > 200 and y < 280 and self.shop_is_open == True and (self.coins - self.toughness_cost) >= 0:
-            self.toughness += 1
-            self.coins -= self.toughness_cost
-            print("ok")
+        if x > 470 and x < 645 and y > 300 and y < 380 and self.shop_is_open == True :
+            if (self.coins - self.max_hp_cost) >= 0:
+                self.max_hp += 15
+                self.coins -= self.max_hp_cost
+                self.upgraded_text = True
+                arcade.play_sound(PURCHASE,0.5)
+            if (self.coins - self.max_hp_cost)  <= 0:
+               arcade.play_sound(NOT_ENOUGH_MONEY)
 
+        if x > 470 and x < 645 and y > 200 and y < 280 and self.shop_is_open == True :
+            if (self.coins - self.toughness_cost) >= 0:
+                self.toughness += 1
+                self.coins -= self.toughness_cost
+                arcade.play_sound(PURCHASE,0.5)
+            else:
+                arcade.play_sound(NOT_ENOUGH_MONEY)
 
         if x > 600 and x < 750 and y > 280 and y < 340 and self.game_done_lost == True:
             self.menu_choice = 1
@@ -1164,7 +1216,7 @@ class MyGame(arcade.Window):
             self.score += 1
             self.game_done_lost = False
             self.game_done_win = False
-
+            self.played = False
             self.menu_choice = 2
             self.turn = "dice"
             self.dice_done = False
@@ -1175,6 +1227,7 @@ class MyGame(arcade.Window):
             self.triple_damage_chance = False
             self.zombie_base_attack = 10
 
+            self.spawned_coins = 0
 
             self.zombie_bullet_list.clear()
             self.bullet_list.clear()
@@ -1186,6 +1239,10 @@ class MyGame(arcade.Window):
             self.coin_list.clear()
             self.super_coin_list.clear()
             self.medkit_list.clear()
+
+            self.foot_damage = False
+            self.body_damage = False
+            self.head_damage = False
 
 
 
@@ -1258,23 +1315,17 @@ class MyGame(arcade.Window):
 
 
                     if zombie_bullet.center_y < 190 and zombie_bullet.center_y >= 155:
-                        print("foot")
                         self.sprite_damage_chance = random.randint(1, self.toughness)
                         if self.sprite_damage_chance == 1:
                             self.foot_damage = True
-                            print("feet damaged")
                     elif zombie_bullet.center_y < 230 and zombie_bullet.center_y >= 190:
-                        print("body")
                         self.sprite_damage_chance = random.randint(1, self.toughness)
                         if self.sprite_damage_chance == 1:
                             self.body_damage = True
-                            print("body damaged")
                     elif zombie_bullet.center_y < 290 and zombie_bullet.center_y >= 230:
-                        print("head")
                         self.sprite_damage_chance = random.randint(1, self.toughness)
                         if self.sprite_damage_chance == 1:
                             self.head_damage = True
-                            print("head damaged")
 
 
 
@@ -1297,7 +1348,7 @@ class MyGame(arcade.Window):
 
             if len(wall_hit_list) > 0 and self.wall_placed == True:
                 self.zombie_did_shoot = True
-                arcade.play_sound(UI)
+                arcade.play_sound(WALL_HIT, 0.2)
 
                 self.zombie_did_not_missed = True
 
@@ -1338,10 +1389,10 @@ class MyGame(arcade.Window):
         #COINS HITBOX
 
         for super_coin in self.super_coin_list:
-
             hit_list = arcade.check_for_collision_with_list(super_coin,self.bullet_list)
 
             if len(hit_list) > 0:
+                arcade.play_sound(COIN_COLLECT)
 
                 self.coins += 30
                 self.bullet.remove_from_sprite_lists()
@@ -1352,6 +1403,7 @@ class MyGame(arcade.Window):
             hit_list = arcade.check_for_collision_with_list(coin, self.bullet_list)
 
             if len(hit_list) > 0:
+                arcade.play_sound(COIN_COLLECT)
 
                 self.coins += 15
                 self.bullet.remove_from_sprite_lists()
@@ -1379,7 +1431,7 @@ class MyGame(arcade.Window):
         if self.turn == "zombie":
 
 
-            zombie_bullet = arcade.Sprite("ballBlue_07.png", BULLET_SCALING)
+            zombie_bullet = arcade.Sprite(resource_path("sprites/ballBlue_07.png"), BULLET_SCALING)
 
             zombie_bullet.center_x = self.zombie_sprite.center_x - 50
             zombie_bullet.center_y = 190 + random.randint(10,100) - random.randint(10,50)
@@ -1390,7 +1442,6 @@ class MyGame(arcade.Window):
             self.zombie_bullet_list.append(zombie_bullet)
             self.zombie_done = True
             self.health_less_than_last_turn = self.health
-            print(self.health_less_than_last_turn)
 
 
 
